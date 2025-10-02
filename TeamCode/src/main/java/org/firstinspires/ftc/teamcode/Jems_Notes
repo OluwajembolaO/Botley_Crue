@@ -1,0 +1,13 @@
+    "There may be questions that you will have
+and I'll try my best to answer confusing questions as I learn myself." - Jem 8:44 AM 10/2/25
+
+    Q: "How do I figure out the amount of ticks equal to one rotation?"
+    A: "Go to the website where you found the motor part. Then, find the Encoder Resolution.
+        Ex) Series Yellow Jacket Planetary Gear Motor
+                Encoder Resolution: 2786.2 PPR at the Output Shaft
+                the amount of ticks will be 2786.2
+        Critical Thinking) Think on how we can easily change the amount of ticks if the motor ever changed
+    - Jem 8:50 AM 10/2/25
+
+
+
