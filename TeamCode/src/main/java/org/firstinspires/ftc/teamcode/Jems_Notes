@@ -9,5 +9,39 @@ and I'll try my best to answer confusing questions as I learn myself." - Jem 8:4
         Critical Thinking) Think on how we can easily change the amount of ticks if the motor ever changed
     - Jem 8:50 AM 10/2/25
 
+    Q: "How does the movements of the motors work?"
+    A: "To properly understand how they move I really recommend watching this video to understand the physics behind it:
+        https://www.youtube.com/watch?v=0k-Ey9bS9lE"
+    - Jem 7:56 PM 10/4/25
+
+    Q: "Ok, I watched the video what is the maximum chunk of code for????"
+    A: "Ok this is a good question. Let me break this down to make it easy as possible.
+        The controllers have a min and max values of 1 and -1. If you take a look at the]
+        video you can see that sometimes there will be total values greater or less than the max.
+        This will cause the robot to move wonky since any value greater than 1 will default to 1
+        anyways. The ratio wouldn't be the same. For example a ratio of 2.5:1 is not the same ratio of 1:1.
+
+                So, how do we solve this?
+                    We can find the biggest velocity from the 4 motors and divide it by each of them to get a
+                    perfect ratio while staying on the same direction.
+                        Ex) We want to move the bot diagonal at the same time rotate to the right (clock wise).
+                            FrontLeftPower  = 1 + 1 + .5 = 2.5
+                            FrontRightPower = 1 - 1 - .5 = -.5
+                            RearLeftPower   = 1 - 1 + .5 = .5
+                            RearRightPower  = 1 + 1 - .5 = 1.5
+
+                            Remember! The min and max values are -1 and 1 so 2.5 and 1.5 will default to 1. The ratios
+                            arent the same.
+
+                            The max power that we have here is 2.5 so, we will divide all powers by 2.5
+                                2.5/2.5 =  1
+                                -.5/2.5 = -.2
+                                .5/2.5 =   .2
+                                1.5/2.5 =  .6
+                            This will maintain the same ratio throughout the robot so that movement is as smooth
+                            as possible. Yes the speed is a little bit slower but its worth it for doing precise calculations."
+    - Jem 9:05 PM 10/4/25
+
+
 
 

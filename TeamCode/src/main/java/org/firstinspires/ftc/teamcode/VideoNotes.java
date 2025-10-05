@@ -51,8 +51,5 @@ public class VideoNotes extends OpMode {
         topRightMotor.setPower(tRPower / max);
         rearLeftMotor.setPower(rLPower / max);
         rearRightMotor.setPower(rRPower / max);
-
-
-
     }
 }
