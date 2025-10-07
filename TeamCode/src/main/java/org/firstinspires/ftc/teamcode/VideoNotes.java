@@ -16,23 +16,23 @@ public class VideoNotes extends OpMode {
     @Override
     public void init() {
         //Sets the motors
-        topLeftMotor = hardwareMap.get(DcMotor.class, "motorName?");
-        topRightMotor = hardwareMap.get(DcMotor.class, "motorName?");
-        rearLeftMotor = hardwareMap.get(DcMotor.class, "motorName?");
-        rearRightMotor = hardwareMap.get(DcMotor.class, "motorName?");
+        topLeftMotor = hardwareMap.get(DcMotor.class, "motor1");
+        topRightMotor = hardwareMap.get(DcMotor.class, "motor2");
+        rearLeftMotor = hardwareMap.get(DcMotor.class, "motor3");
+        rearRightMotor = hardwareMap.get(DcMotor.class, "motor4");
 
         //Why the reverse? Left side move opposite way from right so I would have to reverse it
-//        topLeftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
-//        rearLeftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+        topLeftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+        rearLeftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
 
 
     }
 
     @Override
     public void loop() {
-        double  fwd= -gamepad1.right_stick_y; // forward/back(Y axis)
-        double str = gamepad1.right_stick_x;  // left/right(Strife/X axis)
-        double rot = gamepad1.left_stick_x; // rotation from left stick(Spin go burrrrr)
+        double  fwd= -gamepad1.left_stick_y; // forward/back(Y axis)
+        double str = gamepad1.left_stick_x;  // left/right(Strife/X axis)
+        double rot = gamepad1.right_stick_x; // rotation from left stick(Spin go burrrrr)
 
         double tLPower = fwd + str + rot;
         double rLPower = fwd - str - rot;
