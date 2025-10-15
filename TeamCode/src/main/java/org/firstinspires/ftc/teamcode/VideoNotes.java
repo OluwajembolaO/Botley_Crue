@@ -24,8 +24,6 @@ public class VideoNotes extends OpMode {
         //Why the reverse? Left side move opposite way from right so I would have to reverse it
         topLeftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         rearLeftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
-
-
     }
 
     @Override

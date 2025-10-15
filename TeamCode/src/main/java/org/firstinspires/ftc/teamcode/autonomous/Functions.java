@@ -11,6 +11,9 @@ public class Functions {
         frontRight = hardwareMap.get(DcMotor.class, "motor2");
         rearLeft = hardwareMap.get(DcMotor.class, "motor3");
         rearRight = hardwareMap.get(DcMotor.class, "motor4");
+
+        frontLeft.setDirection(DcMotor.Direction.REVERSE);
+        rearLeft.setDirection(DcMotor.Direction.REVERSE);
     }
 
     // ──────────────── Basic Movement ────────────────
