@@ -5,7 +5,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
-@TeleOp(name="VideoNotes")
+@TeleOp(name="Driver1")
 public class Driver_1 extends OpMode {
     //Represents the 4 motors I know we are probably using like 6-8 motors but this is just the basics
     private DcMotor topLeftMotor;
