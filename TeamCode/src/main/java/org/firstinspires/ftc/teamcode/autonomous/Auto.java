@@ -8,15 +8,15 @@ public class Auto extends LinearOpMode {
 
     Functions robot;
 
+    //Different Actions
     enum State {
-        MOVE_FORWARD,
+        MOVE_FORWARD_1,
         MOVE_BACKWARD,
-        TURN_LEFT,
+        MOVE_FORWARD_2,
+        SLIDE_RIGHT,
+        SLIDE_LEFT,
         TURN_RIGHT,
-        DIAGONAL_FL,
-        DIAGONAL_BR,
-        DIAGONAL_FR,
-        DIAGONAL_BL,
+        TURN_LEFT,
         WAIT,
         STOP
     }
@@ -30,7 +30,7 @@ public class Auto extends LinearOpMode {
 
         waitForStart();
 
-        State currentState = State.MOVE_FORWARD;
+        State currentState = State.MOVE_FORWARD_1;
         State nextState = State.STOP;  // used for WAIT transitions
         long stateStartTime = System.currentTimeMillis();
 
@@ -39,41 +39,69 @@ public class Auto extends LinearOpMode {
 
             switch (currentState) {
 
-                // ─────────── Move Forward ───────────
-                case MOVE_FORWARD:
-                    telemetry.addLine("State: MOVE_FORWARD (3 sec)");
+                // ─────────── Move Forward (4 sec) ───────────
+                case MOVE_FORWARD_1:
+                    telemetry.addLine("State: MOVE_FORWARD (4 sec)");
                     telemetry.update();
                     robot.moveForward(0.5);
 
-                    if (elapsed > 3000) {
+                    if (elapsed > 4000) {
                         robot.stop();
-                        nextState = State.MOVE_BACKWARD;  // next action after wait
+                        nextState = State.MOVE_BACKWARD;
                         currentState = State.WAIT;
                         stateStartTime = System.currentTimeMillis();
                     }
                     break;
 
-                // ─────────── Move Backward ───────────
+                // ─────────── Move Backward (4 sec) ───────────
                 case MOVE_BACKWARD:
-                    telemetry.addLine("State: MOVE_BACKWARD (3 sec)");
+                    telemetry.addLine("State: MOVE_BACKWARD (4 sec)");
                     telemetry.update();
                     robot.moveBackward(0.5);
 
-                    if (elapsed > 3000) {
+                    if (elapsed > 4000) {
                         robot.stop();
-                        nextState = State.TURN_LEFT;
+                        nextState = State.MOVE_FORWARD_2;
                         currentState = State.WAIT;
                         stateStartTime = System.currentTimeMillis();
                     }
                     break;
 
-                // ─────────── Turn Left ───────────
-                case TURN_LEFT:
-                    telemetry.addLine("State: TURN_LEFT (2 sec)");
+                // ─────────── Move Forward (2 sec) ───────────
+                case MOVE_FORWARD_2:
+                    telemetry.addLine("State: MOVE_FORWARD (2 sec)");
                     telemetry.update();
-                    robot.turnLeft(0.5);
+                    robot.moveForward(0.5);
 
                     if (elapsed > 2000) {
+                        robot.stop();
+                        nextState = State.SLIDE_RIGHT;
+                        currentState = State.WAIT;
+                        stateStartTime = System.currentTimeMillis();
+                    }
+                    break;
+
+                // ─────────── Slide Right (3 sec) ───────────
+                case SLIDE_RIGHT:
+                    telemetry.addLine("State: SLIDE_RIGHT (3 sec)");
+                    telemetry.update();
+                    robot.moveRight(0.5);
+
+                    if (elapsed > 3000) {
+                        robot.stop();
+                        nextState = State.SLIDE_LEFT;
+                        currentState = State.WAIT;
+                        stateStartTime = System.currentTimeMillis();
+                    }
+                    break;
+
+                // ─────────── Slide Left (3 sec) ───────────
+                case SLIDE_LEFT:
+                    telemetry.addLine("State: SLIDE_LEFT (3 sec)");
+                    telemetry.update();
+                    robot.moveLeft(0.5);
+
+                    if (elapsed > 3000) {
                         robot.stop();
                         nextState = State.TURN_RIGHT;
                         currentState = State.WAIT;
@@ -81,7 +109,7 @@ public class Auto extends LinearOpMode {
                     }
                     break;
 
-                // ─────────── Turn Right ───────────
+                // ─────────── Turn Right (2 sec) ───────────
                 case TURN_RIGHT:
                     telemetry.addLine("State: TURN_RIGHT (2 sec)");
                     telemetry.update();
@@ -89,61 +117,19 @@ public class Auto extends LinearOpMode {
 
                     if (elapsed > 2000) {
                         robot.stop();
-                        nextState = State.DIAGONAL_FL;
+                        nextState = State.TURN_LEFT;
                         currentState = State.WAIT;
                         stateStartTime = System.currentTimeMillis();
                     }
                     break;
 
-                // ─────────── Diagonal Forward Left ───────────
-                case DIAGONAL_FL:
-                    telemetry.addLine("State: DIAGONAL_FORWARD_LEFT (2 sec)");
+                // ─────────── Turn Left (2 sec) ───────────
+                case TURN_LEFT:
+                    telemetry.addLine("State: TURN_LEFT (2 sec)");
                     telemetry.update();
-                    robot.moveDiagonalForwardLeft(0.5);
+                    robot.turnLeft(0.5);
 
-                    if (elapsed > 2000) {
-                        robot.stop();
-                        nextState = State.DIAGONAL_BR;
-                        currentState = State.WAIT;
-                        stateStartTime = System.currentTimeMillis();
-                    }
-                    break;
-
-                // ─────────── Diagonal Backward Right ───────────
-                case DIAGONAL_BR:
-                    telemetry.addLine("State: DIAGONAL_BACKWARD_RIGHT (2 sec)");
-                    telemetry.update();
-                    robot.moveDiagonalBackwardRight(0.5);
-
-                    if (elapsed > 2000) {
-                        robot.stop();
-                        nextState = State.DIAGONAL_FR;
-                        currentState = State.WAIT;
-                        stateStartTime = System.currentTimeMillis();
-                    }
-                    break;
-
-                // ─────────── Diagonal Forward Right ───────────
-                case DIAGONAL_FR:
-                    telemetry.addLine("State: DIAGONAL_FORWARD_RIGHT (2 sec)");
-                    telemetry.update();
-                    robot.moveDiagonalForwardRight(0.5);
-
-                    if (elapsed > 2000) {
-                        robot.stop();
-                        nextState = State.DIAGONAL_BL;
-                        currentState = State.WAIT;
-                        stateStartTime = System.currentTimeMillis();
-                    }
-                    break;
-
-                // ─────────── Diagonal Backward Left ───────────
-                case DIAGONAL_BL:
-                    telemetry.addLine("State: DIAGONAL_BACKWARD_LEFT (2 sec)");
-                    telemetry.update();
-                    robot.moveDiagonalBackwardLeft(0.5);
-
-                    if (elapsed > 2000) {
+                    if (elapsed > 3500) {
                         robot.stop();
                         nextState = State.STOP;
                         currentState = State.WAIT;
