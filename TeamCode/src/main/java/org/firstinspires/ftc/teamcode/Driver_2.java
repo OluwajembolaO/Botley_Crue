@@ -6,7 +6,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 @TeleOp(name="VideoNotes")
-public class VideoNotes extends OpMode {
+public class Driver_2 extends OpMode {
     //Represents the 4 motors I know we are probably using like 6-8 motors but this is just the basics
     private DcMotor topLeftMotor;
     private DcMotor topRightMotor;
@@ -28,26 +28,55 @@ public class VideoNotes extends OpMode {
 
     @Override
     public void loop() {
-        double  fwd= -gamepad1.left_stick_y; // forward/back(Y axis)
-        double str = gamepad1.left_stick_x;  // left/right(Strife/X axis)
-        double rot = gamepad1.right_stick_x; // rotation from left stick(Spin go burrrrr)
+        double speed = 0.5; // Default 50% power
+
+        // D-pad controls instead of joysticks
+        double fwd = 0;
+        double str = 0;
+        double rot = gamepad1.right_stick_x; // Keep rotation on right stick
+
+        // Forward/Backward with D-pad up/down
+        if(gamepad1.dpad_up) {
+            fwd = 1.0;
+        }
+        if(gamepad1.dpad_down) {
+            fwd = -1.0;
+        }
+
+        // Left/Right (strafe) with D-pad left/right
+        if(gamepad1.dpad_left) {
+            str = -1.0;
+        }
+        if(gamepad1.dpad_right) {
+            str = 1.0;
+        }
+
+        float lt = gamepad1.left_trigger;   // Slow down trigger
+        float rt = gamepad1.right_trigger;  // Speed up trigger
+
+        // Adjust speed based on triggers (0.0 to 1.0)
+        if(lt > 0.5) {
+            speed = 0.25; // 25% power when left trigger pressed
+        }
+        if(rt > 0.5) {
+            speed = 0.75; // 75% power when right trigger pressed
+        }
 
         double tLPower = fwd + str + rot;
-        double rLPower = fwd - str - rot;
-        double tRPower = fwd - str + rot;
+        double rLPower = fwd - str + rot;
+        double tRPower = fwd - str - rot;
         double rRPower = fwd + str - rot;
 
-        //You might not understand this but its important for the robot to move smoothly
-        //Look at my notes for better understanding
+        // Normalize the motor powers
         double max = Math.max(1.0, Math.abs(tLPower));
         max = Math.max(max, Math.abs(rLPower));
         max = Math.max(max, Math.abs(tRPower));
         max = Math.max(max, Math.abs(rRPower));
 
-        //This gives all motor powers that "perfect ratio" so the robot moves smoothly to the input
-        topLeftMotor.setPower(tLPower / max);
-        topRightMotor.setPower(tRPower / max);
-        rearLeftMotor.setPower(rLPower / max);
-        rearRightMotor.setPower(rRPower / max);
+        // Apply normalized power multiplied by speed
+        topLeftMotor.setPower((tLPower / max) * speed);
+        topRightMotor.setPower((tRPower / max) * speed);
+        rearLeftMotor.setPower((rLPower / max) * speed);
+        rearRightMotor.setPower((rRPower / max) * speed);
     }
 }
