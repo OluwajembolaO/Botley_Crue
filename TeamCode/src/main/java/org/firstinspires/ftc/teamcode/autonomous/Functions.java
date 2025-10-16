@@ -39,6 +39,16 @@ public class Functions {
         turnLeft(-power);
     }
 
+    public void moveRight(double power){
+        frontLeft.setPower(power);
+        frontRight.setPower(-power);
+        rearLeft.setPower(-power);
+        rearRight.setPower(power);
+    }
+
+    public void moveLeft(double power) {
+        moveRight(-power);
+    }
     public void stop() {
         moveForward(0);
     }
