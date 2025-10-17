@@ -35,6 +35,6 @@ public class AprilTags_Jem extends OpMode {
     public void loop() {
         YawPitchRollAngles orientation = imu.getRobotYawPitchRollAngles();
         limelight.updateRobotOrientation(orientation.getYaw());
-
+        LLResult llResult = limelight.getLatestResult();
     }
 }
