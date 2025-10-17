@@ -25,6 +25,7 @@ public class Limelight_Track extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException
     {
+        //This gets the limelight hardware
         limelight = hardwareMap.get(Limelight3A.class, "limelight");
 
 
@@ -92,7 +93,7 @@ public class Limelight_Track extends LinearOpMode {
 
 
 
-
+                //Recognize real world objects (AI)
                 List<LLResultTypes.DetectorResult> detectorResults = result.getDetectorResults();
                 for (LLResultTypes.DetectorResult dr : detectorResults) {
                     telemetry.addData("Detector", "Class: %s, Area: %.2f", dr.getClassName(), dr.getTargetArea());
@@ -100,7 +101,7 @@ public class Limelight_Track extends LinearOpMode {
 
 
 
-
+                //Gets pattern of April Tags
                 List<LLResultTypes.FiducialResult> fiducialResults = result.getFiducialResults();
                 for (LLResultTypes.FiducialResult fr : fiducialResults)
                     telemetry.addData("Fiducial", "ID: %d, Family: %s, X: %.2f, Y: %.2f", fr.getFiducialId(), fr.getFamily(), fr.getTargetXDegrees(), fr.getTargetYDegrees());
@@ -109,6 +110,7 @@ public class Limelight_Track extends LinearOpMode {
                 telemetry.addData("Limelight", "No data available");
             }
 
+            //Checks for colors
             List<LLResultTypes.ColorResult> colorResults = result.getColorResults();
             for (LLResultTypes.ColorResult cr : colorResults) {
                 telemetry.addData("Color", "X: %.2f, Y: %.2f", cr.getTargetXDegrees(), cr.getTargetYDegrees());
