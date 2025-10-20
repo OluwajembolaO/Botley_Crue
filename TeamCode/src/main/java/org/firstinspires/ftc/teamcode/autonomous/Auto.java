@@ -43,7 +43,7 @@ public class Auto extends LinearOpMode {
                 case MOVE_FORWARD_1:
                     telemetry.addLine("State: MOVE_FORWARD (4 sec)");
                     telemetry.update();
-                    robot.moveForward(0.5);
+                    robot.moveForward(0.75);
 
                     if (elapsed > 4000) {
                         robot.stop();
@@ -57,7 +57,7 @@ public class Auto extends LinearOpMode {
                 case MOVE_BACKWARD:
                     telemetry.addLine("State: MOVE_BACKWARD (4 sec)");
                     telemetry.update();
-                    robot.moveBackward(0.5);
+                    robot.moveBackward(0.75);
 
                     if (elapsed > 4000) {
                         robot.stop();
@@ -71,7 +71,7 @@ public class Auto extends LinearOpMode {
                 case MOVE_FORWARD_2:
                     telemetry.addLine("State: MOVE_FORWARD (2 sec)");
                     telemetry.update();
-                    robot.moveForward(0.5);
+                    robot.moveForward(0.75);
 
                     if (elapsed > 2000) {
                         robot.stop();
@@ -85,7 +85,7 @@ public class Auto extends LinearOpMode {
                 case SLIDE_RIGHT:
                     telemetry.addLine("State: SLIDE_RIGHT (3 sec)");
                     telemetry.update();
-                    robot.moveRight(0.5);
+                    robot.moveRight(0.75);
 
                     if (elapsed > 3000) {
                         robot.stop();
@@ -99,7 +99,7 @@ public class Auto extends LinearOpMode {
                 case SLIDE_LEFT:
                     telemetry.addLine("State: SLIDE_LEFT (3 sec)");
                     telemetry.update();
-                    robot.moveLeft(0.5);
+                    robot.moveLeft(0.75);
 
                     if (elapsed > 3000) {
                         robot.stop();
@@ -113,7 +113,7 @@ public class Auto extends LinearOpMode {
                 case TURN_RIGHT:
                     telemetry.addLine("State: TURN_RIGHT (2 sec)");
                     telemetry.update();
-                    robot.turnRight(0.5);
+                    robot.turnRight(0.75);
 
                     if (elapsed > 2000) {
                         robot.stop();
@@ -127,7 +127,7 @@ public class Auto extends LinearOpMode {
                 case TURN_LEFT:
                     telemetry.addLine("State: TURN_LEFT (2 sec)");
                     telemetry.update();
-                    robot.turnLeft(0.5);
+                    robot.turnLeft(0.75);
 
                     if (elapsed > 3500) {
                         robot.stop();
