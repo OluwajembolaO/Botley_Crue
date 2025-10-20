@@ -32,7 +32,7 @@ public class Limelight_Track extends LinearOpMode {
         telemetry.setMsTransmissionInterval(11);
 
 
-        limelight.pipelineSwitch(0); // 8 is april tags
+        limelight.pipelineSwitch(8); // 8 is april tags
 
 
 
@@ -103,8 +103,14 @@ public class Limelight_Track extends LinearOpMode {
 
                 //Gets pattern of April Tags
                 List<LLResultTypes.FiducialResult> fiducialResults = result.getFiducialResults();
-                for (LLResultTypes.FiducialResult fr : fiducialResults)
+                for (LLResultTypes.FiducialResult fr : fiducialResults) {
                     telemetry.addData("Fiducial", "ID: %d, Family: %s, X: %.2f, Y: %.2f", fr.getFiducialId(), fr.getFamily(), fr.getTargetXDegrees(), fr.getTargetYDegrees());
+
+                    // Check if AprilTag ID is 22
+                    if (fr.getFiducialId() == 22) {
+                        telemetry.addData("DETECTED", "stm");
+                    }
+                }
             }
             else {
                 telemetry.addData("Limelight", "No data available");
