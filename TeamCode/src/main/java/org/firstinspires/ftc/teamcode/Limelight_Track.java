@@ -10,6 +10,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 
 import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
+import org.firstinspires.ftc.teamcode.autonomous.Functions;
 
 
 import java.util.List;
@@ -21,13 +22,15 @@ public class Limelight_Track extends LinearOpMode {
 
     private Limelight3A limelight;
 
+    Functions robot;
+
 
     @Override
     public void runOpMode() throws InterruptedException
     {
         //This gets the limelight hardware
         limelight = hardwareMap.get(Limelight3A.class, "limelight");
-
+        robot = new Functions(hardwareMap);
 
         telemetry.setMsTransmissionInterval(11);
 
@@ -106,10 +109,24 @@ public class Limelight_Track extends LinearOpMode {
                 for (LLResultTypes.FiducialResult fr : fiducialResults) {
                     telemetry.addData("Fiducial", "ID: %d, Family: %s, X: %.2f, Y: %.2f", fr.getFiducialId(), fr.getFamily(), fr.getTargetXDegrees(), fr.getTargetYDegrees());
 
+                    // Check if AprilTag ID is 21
+                    if (fr.getFiducialId() == 21) {
+                        robot.moveForward(.7, 2.0);
+                        telemetry.addData("DETECTED", "ID 21");
+                    }
+
                     // Check if AprilTag ID is 22
                     if (fr.getFiducialId() == 22) {
-                        telemetry.addData("DETECTED", "stm");
+                        robot.moveBackward(.7, 2.0);
+                        telemetry.addData("DETECTED", "ID 22");
                     }
+
+                    // Check if AprilTag ID is 23
+                    if (fr.getFiducialId() == 23) {
+                        robot.moveLeft(.7, 2.0);
+                        telemetry.addData("DETECTED", "ID 23");
+                    }
+
                 }
             }
             else {
