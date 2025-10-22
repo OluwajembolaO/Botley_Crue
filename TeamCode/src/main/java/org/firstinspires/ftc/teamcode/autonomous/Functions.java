@@ -106,7 +106,7 @@ public class Functions {
     }
 
     // ──────────────── Helper Methods ────────────────
-    private void sleep(double seconds) {
+    public void sleep(double seconds) {
         try {
             Thread.sleep((long)(seconds * 1000));
         } catch (InterruptedException e) {
