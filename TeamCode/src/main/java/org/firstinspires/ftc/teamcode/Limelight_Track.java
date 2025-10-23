@@ -111,19 +111,19 @@ public class Limelight_Track extends LinearOpMode {
 
                     // Check if AprilTag ID is 21
                     if (fr.getFiducialId() == 21) {
-                        robot.moveForward(.7, 2.0);
+                        robot.moveForward(.35, 0.3);
                         telemetry.addData("DETECTED", "ID 21");
                     }
 
                     // Check if AprilTag ID is 22
                     if (fr.getFiducialId() == 22) {
-                        robot.moveBackward(.7, 2.0);
+                        robot.moveBackward(.35, 0.3);
                         telemetry.addData("DETECTED", "ID 22");
                     }
 
                     // Check if AprilTag ID is 23
                     if (fr.getFiducialId() == 23) {
-                        robot.moveLeft(.7, 2.0);
+                        robot.moveLeft(.35, 0.3);
                         telemetry.addData("DETECTED", "ID 23");
                     }
                     
