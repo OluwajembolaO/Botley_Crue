@@ -12,6 +12,7 @@ public class Driver_1 extends OpMode {
     private DcMotor topRightMotor;
     private DcMotor rearLeftMotor;
     private DcMotor rearRightMotor;
+    private DcMotor intake;
 
     @Override
     public void init() {
@@ -20,6 +21,7 @@ public class Driver_1 extends OpMode {
         topRightMotor = hardwareMap.get(DcMotor.class, "motor2");
         rearLeftMotor = hardwareMap.get(DcMotor.class, "motor3");
         rearRightMotor = hardwareMap.get(DcMotor.class, "motor4");
+        intake = hardwareMap.get(DcMotor.class, "intake");
 
         //Why the reverse? Left side move opposite way from right so I would have to reverse it
         rearRightMotor.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -28,6 +30,10 @@ public class Driver_1 extends OpMode {
 
     @Override
     public void loop() {
+        intake.setPower(0);
+        if (gamepad1.left_bumper){
+            intake.setPower(1);
+        }
         double speed = 0.5; // Default 50% power
         double fwd = gamepad1.left_stick_y; // forward/back(Y axis) - REMOVED negative sign
         double str = -gamepad1.left_stick_x;  // left/right(Strife/X axis)
