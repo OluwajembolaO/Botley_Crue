@@ -21,6 +21,7 @@ public class JemHome extends OpMode {
     private DcMotor topRightMotor;
     private DcMotor rearLeftMotor;
     private DcMotor rearRightMotor;
+    private DcMotor intake;
 
     // Simple bang-bang control parameters
     private static final double DEADZONE = 5.0;  // degrees - if TX is within this, consider aligned
@@ -36,6 +37,7 @@ public class JemHome extends OpMode {
         topRightMotor = hardwareMap.get(DcMotor.class, "motor2");
         rearLeftMotor = hardwareMap.get(DcMotor.class, "motor3");
         rearRightMotor = hardwareMap.get(DcMotor.class, "motor4");
+        intake = hardwareMap.get(DcMotor.class, "intake");
 
         //Why the reverse? Left side move opposite way from right so I would have to reverse it
         rearRightMotor.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -61,6 +63,10 @@ public class JemHome extends OpMode {
 
     @Override
     public void loop() {
+        intake.setPower(0);
+        if (gamepad1.circle){
+            intake.setPower(1);
+        }
         // Get robot IMU yaw and update limelight
         YawPitchRollAngles orientation = imu.getRobotYawPitchRollAngles();
         limelight.updateRobotOrientation(orientation.getYaw());
