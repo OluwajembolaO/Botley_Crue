@@ -5,13 +5,14 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 public class Functions {
-    DcMotor frontLeft, frontRight, rearLeft, rearRight;
+    DcMotor frontLeft, frontRight, rearLeft, rearRight, intake;
 
     public Functions(HardwareMap hardwareMap) {
         frontLeft = hardwareMap.get(DcMotor.class, "motor1");
         frontRight = hardwareMap.get(DcMotor.class, "motor2");
         rearLeft = hardwareMap.get(DcMotor.class, "motor3");
         rearRight = hardwareMap.get(DcMotor.class, "motor4");
+        intake = hardwareMap.get(DcMotor.class, "intake");
 
         rearRight.setDirection(DcMotorSimple.Direction.REVERSE);
         frontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -26,7 +27,6 @@ public class Functions {
         sleep(seconds);
         stop();
     }
-
     public void moveBackward(double power, double seconds) {
         moveForward(-power, seconds);
     }
@@ -103,6 +103,22 @@ public class Functions {
         rearLeft.setPower(0);
         sleep(seconds);
         stop();
+    }
+
+    // ──────────────── Intake Control ────────────────
+    // Start the intake motor spinning
+    public void startIntake(double power) {
+        intake.setPower(power);
+    }
+
+    // Stop the intake motor
+    public void stopIntake() {
+        intake.setPower(0);
+    }
+
+    // Reverse the intake motor (useful for ejecting)
+    public void reverseIntake(double power) {
+        intake.setPower(-power);
     }
 
     // ──────────────── Helper Methods ────────────────
