@@ -1,22 +1,40 @@
 package org.firstinspires.ftc.teamcode.autonomous;
 
+import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 public class Functions {
-    DcMotor frontLeft, frontRight, rearLeft, rearRight;
+    DcMotor frontLeft, frontRight, rearLeft, rearRight, intake;
+    Limelight3A limelight3A;
 
     public Functions(HardwareMap hardwareMap) {
         frontLeft = hardwareMap.get(DcMotor.class, "motor1");
         frontRight = hardwareMap.get(DcMotor.class, "motor2");
         rearLeft = hardwareMap.get(DcMotor.class, "motor3");
         rearRight = hardwareMap.get(DcMotor.class, "motor4");
+        intake = hardwareMap.get(DcMotor.class, "intake");
+        limelight3A = hardwareMap.get(Limelight3A.class, "limelight");
+
 
         rearRight.setDirection(DcMotorSimple.Direction.REVERSE);
         frontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
+        intake.setDirection(DcMotorSimple.Direction.REVERSE);
     }
 
+
+
+    public void turnOnIntake(){
+        intake.setPower(1);
+
+    }
+    public void setLightMode(int num){
+        limelight3A.pipelineSwitch(num);
+    }
+    public void turnOffIntake(){
+        intake.setPower(0);
+    }
     // ──────────────── Basic Movement ────────────────
     public void moveForward(double power, double seconds) {
         frontLeft.setPower(power);
