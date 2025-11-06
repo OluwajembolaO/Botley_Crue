@@ -16,8 +16,7 @@ public class Functions {
         rearRight = hardwareMap.get(DcMotor.class, "motor4");
         intake = hardwareMap.get(DcMotor.class, "intake");
         limelight3A = hardwareMap.get(Limelight3A.class, "limelight");
-
-
+      
         rearRight.setDirection(DcMotorSimple.Direction.REVERSE);
         frontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
         intake.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -44,7 +43,6 @@ public class Functions {
         sleep(seconds);
         stop();
     }
-
     public void moveBackward(double power, double seconds) {
         moveForward(-power, seconds);
     }
@@ -121,6 +119,22 @@ public class Functions {
         rearLeft.setPower(0);
         sleep(seconds);
         stop();
+    }
+
+    // ──────────────── Intake Control ────────────────
+    // Start the intake motor spinning
+    public void startIntake(double power) {
+        intake.setPower(power);
+    }
+
+    // Stop the intake motor
+    public void stopIntake() {
+        intake.setPower(0);
+    }
+
+    // Reverse the intake motor (useful for ejecting)
+    public void reverseIntake(double power) {
+        intake.setPower(-power);
     }
 
     // ──────────────── Helper Methods ────────────────

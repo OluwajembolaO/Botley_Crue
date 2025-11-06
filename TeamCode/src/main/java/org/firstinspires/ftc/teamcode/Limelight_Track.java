@@ -7,6 +7,7 @@ import com.qualcomm.hardware.limelightvision.LLStatus;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
 
 
 import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
@@ -23,11 +24,13 @@ public class Limelight_Track extends LinearOpMode {
     private Limelight3A limelight;
 
     Functions robot;
+    private DcMotor intake;
 
 
     @Override
     public void runOpMode() throws InterruptedException
     {
+
         //This gets the limelight hardware
         limelight = hardwareMap.get(Limelight3A.class, "limelight");
         robot = new Functions(hardwareMap);
@@ -111,19 +114,27 @@ public class Limelight_Track extends LinearOpMode {
 
                     // Check if AprilTag ID is 21
                     if (fr.getFiducialId() == 21) {
-                        robot.moveForward(.35, 0.3);
+                        robot.startIntake(0.8);
+                        robot.moveLeft(.5,3.0);
+                        robot.stopIntake();
                         telemetry.addData("DETECTED", "ID 21");
                     }
 
                     // Check if AprilTag ID is 22
                     if (fr.getFiducialId() == 22) {
-                        robot.moveBackward(.35, 0.3);
+                        robot.startIntake(0.8);
+                        robot.moveForward(.5, 2.0);
+                        robot.moveLeft(.5,2.0);
+                        robot.stopIntake();
                         telemetry.addData("DETECTED", "ID 22");
                     }
 
                     // Check if AprilTag ID is 23
                     if (fr.getFiducialId() == 23) {
-                        robot.moveLeft(.35, 0.3);
+                        robot.startIntake(0.8);
+                        robot.moveForward(.5, 4.0);
+                        robot.moveLeft(.7, 2.0);
+                        robot.stopIntake();
                         telemetry.addData("DETECTED", "ID 23");
                     }
                     
