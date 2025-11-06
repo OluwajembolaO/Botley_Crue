@@ -38,7 +38,7 @@ public class Driver_1 extends OpMode {
         double speed = 0.65; // Default 50% power
         double fwd = gamepad1.left_stick_y; // forward/back(Y axis) - REMOVED negative sign
         double str = -gamepad1.left_stick_x;  // left/right(Strife/X axis)
-        double rot = gamepad1.right_stick_x; // rotation from right stick(Spin go burrrrr)
+        double rot = -gamepad1.right_stick_x; // rotation from right stick(Spin go burrrrr)
 
         float lt = gamepad1.left_trigger;   // Slow down trigger
         float rt = gamepad1.right_trigger;  // Speed up trigger
