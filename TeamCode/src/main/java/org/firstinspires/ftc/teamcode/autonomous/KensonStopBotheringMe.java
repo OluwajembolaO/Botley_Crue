@@ -67,6 +67,7 @@ public class KensonStopBotheringMe extends LinearOpMode {
         telemetry.update();
 
         robot.stop();
+        robot.turnOffIntake(); // Make sure intake is off at the end
         limelight.stop();
     }
 
@@ -92,17 +93,18 @@ public class KensonStopBotheringMe extends LinearOpMode {
         telemetry.addLine("=== EXECUTING SEQUENCE 21 ===");
         telemetry.update();
 
-        robot.moveForward(0.75, 4.0);
+        robot.turnOnIntake(); // Start intake at beginning
+
+        robot.moveForward(0.40, 1.4);
         sleep(500);
 
-        robot.turnLeft(0.75, 2.0);
+        robot.turnLeft(0.50, 2.0);
         sleep(500);
 
-        robot.moveForward(0.75, 2.0);
+        robot.moveForward(0.50, 2.0);
         sleep(500);
 
-        robot.moveRight(0.75, 1.5);
-        sleep(500);
+        robot.turnOffIntake(); // Stop intake when done
     }
 
     // Sequence for AprilTag 22 - Runs to completion without interruption
@@ -110,17 +112,18 @@ public class KensonStopBotheringMe extends LinearOpMode {
         telemetry.addLine("=== EXECUTING SEQUENCE 22 ===");
         telemetry.update();
 
-        robot.moveForward(0.75, 4.0);
+        robot.turnOnIntake(); // Start intake at beginning
+
+        robot.moveForward(0.40, 2.0);
         sleep(500);
 
-        robot.moveRight(0.75, 3.0);
+        robot.turnLeft(0.50, 2.0);
+        sleep(500);;
+
+        robot.moveForward(0.50, 2.0);
         sleep(500);
 
-        robot.moveBackward(0.75, 2.0);
-        sleep(500);
-
-        robot.turnRight(0.75, 1.5);
-        sleep(500);
+        robot.turnOffIntake(); // Stop intake when done
     }
 
     // Sequence for AprilTag 23 - Runs to completion without interruption
@@ -128,18 +131,18 @@ public class KensonStopBotheringMe extends LinearOpMode {
         telemetry.addLine("=== EXECUTING SEQUENCE 23 ===");
         telemetry.update();
 
-        robot.moveForward(0.75, 4.0);
+        robot.turnOnIntake(); // Start intake at beginning
+
+        robot.moveForward(0.40, 2.5);
         sleep(500);
 
-        robot.turnRight(0.75, 2.0);
+        robot.turnLeft(0.50, 2.0);
+        sleep(500);;
+
+        robot.moveForward(0.50, 2.0);
         sleep(500);
 
-        robot.moveForward(0.75, 2.0);
-        sleep(500);
-
-        robot.moveLeft(0.75, 1.5);
-        sleep(500);
+        robot.turnOffIntake(); // Stop intake when done
     }
-
 
 }
