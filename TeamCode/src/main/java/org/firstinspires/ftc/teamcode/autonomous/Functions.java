@@ -17,7 +17,7 @@ public class Functions {
         intake = hardwareMap.get(DcMotor.class, "intake");
         limelight3A = hardwareMap.get(Limelight3A.class, "limelight");
       
-        rearRight.setDirection(DcMotorSimple.Direction.REVERSE);
+        frontRight.setDirection(DcMotorSimple.Direction.REVERSE);
         frontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
         intake.setDirection(DcMotorSimple.Direction.REVERSE);
     }

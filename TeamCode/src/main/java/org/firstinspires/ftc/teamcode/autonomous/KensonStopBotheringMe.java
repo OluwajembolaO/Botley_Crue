@@ -41,12 +41,19 @@ public class KensonStopBotheringMe extends LinearOpMode {
 
         waitForStart();
 
-        // If no tag was detected during init, try one more time
-        if (detectedTagId == -1) {
-            telemetry.addLine("Scanning one more time...");
-            telemetry.update();
-            sleep(500); // Give camera time to stabilize
+        // Keep scanning until we detect a valid tag
+        telemetry.addLine("Started! Scanning for AprilTag...");
+        telemetry.update();
+
+        while (opModeIsActive() && detectedTagId == -1) {
             detectedTagId = detectAprilTag();
+            if (detectedTagId != -1) {
+                telemetry.addData("✓ Detected AprilTag", detectedTagId);
+            } else {
+                telemetry.addLine("⟳ Scanning... (looking for tags 21, 22, or 23)");
+            }
+            telemetry.update();
+            sleep(100);
         }
 
         // Execute sequence based on detected AprilTag - will run to completion
@@ -59,9 +66,6 @@ public class KensonStopBotheringMe extends LinearOpMode {
         } else if (detectedTagId == 23) {
             executeSequence23();
             telemetry.addLine("Sequence 23 Complete!");
-        } else {
-            telemetry.addLine("ERROR: No valid AprilTag detected!");
-            telemetry.addLine("No sequence executed.");
         }
 
         telemetry.update();
@@ -140,6 +144,4 @@ public class KensonStopBotheringMe extends LinearOpMode {
         robot.moveLeft(0.75, 1.5);
         sleep(500);
     }
-
-
 }

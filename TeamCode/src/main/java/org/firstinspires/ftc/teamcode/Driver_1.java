@@ -52,8 +52,8 @@ public class Driver_1 extends OpMode {
         }
 
         double tLPower = fwd + str + rot;
-        double rLPower = fwd - str + rot;
-        double tRPower = fwd - str - rot;
+        double rLPower = fwd - str - rot;
+        double tRPower = fwd - str + rot;
         double rRPower = fwd + str - rot;
 
         // Normalize the motor powers
