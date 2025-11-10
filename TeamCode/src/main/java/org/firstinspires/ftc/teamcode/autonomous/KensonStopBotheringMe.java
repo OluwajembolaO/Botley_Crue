@@ -91,57 +91,60 @@ public class KensonStopBotheringMe extends LinearOpMode {
         return -1; // No valid tag detected
     }
 
-    // Sequence for AprilTag 21 - Runs to completion without interruption
+    // Sequence for AprilTag 21 - Intake runs during entire sequence
     private void executeSequence21() {
         telemetry.addLine("=== EXECUTING SEQUENCE 21 ===");
         telemetry.update();
 
-        robot.moveForward(0.75, 4.0);
+        robot.turnOnIntake(); // Start intake at beginning of sequence
+
+        robot.moveForward(0.2, 1.25);
         sleep(500);
 
-        robot.turnLeft(0.75, 2.0);
+        robot.turnLeft(0.25, 2.0);
         sleep(500);
 
-        robot.moveForward(0.75, 2.0);
+        robot.moveForward(0.25, 4.0);
         sleep(500);
 
-        robot.moveRight(0.75, 1.5);
-        sleep(500);
+        robot.turnOffIntake(); // Stop intake at end of sequence
     }
 
-    // Sequence for AprilTag 22 - Runs to completion without interruption
+    // Sequence for AprilTag 22 - Intake runs during entire sequence
     private void executeSequence22() {
         telemetry.addLine("=== EXECUTING SEQUENCE 22 ===");
         telemetry.update();
 
-        robot.moveForward(0.75, 4.0);
+        robot.turnOnIntake(); // Start intake at beginning of sequence
+
+        robot.moveForward(0.2, 4.0);
         sleep(500);
 
-        robot.moveRight(0.75, 3.0);
+        robot.turnLeft(0.25, 2.0);
         sleep(500);
 
-        robot.moveBackward(0.75, 2.0);
+        robot.moveForward(0.25, 4.0);
         sleep(500);
 
-        robot.turnRight(0.75, 1.5);
-        sleep(500);
+        robot.turnOffIntake(); // Stop intake at end of sequence
     }
 
-    // Sequence for AprilTag 23 - Runs to completion without interruption
+    // Sequence for AprilTag 23 - Intake runs during entire sequence
     private void executeSequence23() {
         telemetry.addLine("=== EXECUTING SEQUENCE 23 ===");
         telemetry.update();
 
-        robot.moveForward(0.75, 4.0);
+        robot.turnOnIntake(); // Start intake at beginning of sequence
+
+        robot.moveForward(0.2, 6.0);
         sleep(500);
 
-        robot.turnRight(0.75, 2.0);
+        robot.turnLeft(0.25, 2.0);
         sleep(500);
 
-        robot.moveForward(0.75, 2.0);
+        robot.moveForward(0.25, 4.8);
         sleep(500);
 
-        robot.moveLeft(0.75, 1.5);
-        sleep(500);
+        robot.turnOffIntake(); // Stop intake at end of sequence
     }
 }
