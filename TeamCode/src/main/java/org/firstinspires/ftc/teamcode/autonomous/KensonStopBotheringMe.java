@@ -41,12 +41,19 @@ public class KensonStopBotheringMe extends LinearOpMode {
 
         waitForStart();
 
-        // If no tag was detected during init, try one more time
-        if (detectedTagId == -1) {
-            telemetry.addLine("Scanning one more time...");
-            telemetry.update();
-            sleep(500); // Give camera time to stabilize
+        // Keep scanning until we detect a valid tag
+        telemetry.addLine("Started! Scanning for AprilTag...");
+        telemetry.update();
+
+        while (opModeIsActive() && detectedTagId == -1) {
             detectedTagId = detectAprilTag();
+            if (detectedTagId != -1) {
+                telemetry.addData("✓ Detected AprilTag", detectedTagId);
+            } else {
+                telemetry.addLine("⟳ Scanning... (looking for tags 21, 22, or 23)");
+            }
+            telemetry.update();
+            sleep(100);
         }
 
         // Execute sequence based on detected AprilTag - will run to completion
@@ -59,15 +66,11 @@ public class KensonStopBotheringMe extends LinearOpMode {
         } else if (detectedTagId == 23) {
             executeSequence23();
             telemetry.addLine("Sequence 23 Complete!");
-        } else {
-            telemetry.addLine("ERROR: No valid AprilTag detected!");
-            telemetry.addLine("No sequence executed.");
         }
 
         telemetry.update();
 
         robot.stop();
-        robot.turnOffIntake(); // Make sure intake is off at the end, tresh me
         limelight.stop();
     }
 
@@ -88,61 +91,60 @@ public class KensonStopBotheringMe extends LinearOpMode {
         return -1; // No valid tag detected
     }
 
-    // Sequence for AprilTag 21 - Runs to completion without interruption
+    // Sequence for AprilTag 21 - Intake runs during entire sequence
     private void executeSequence21() {
         telemetry.addLine("=== EXECUTING SEQUENCE 21 ===");
         telemetry.update();
 
-        robot.turnOnIntake(); // Start intake at beginning bababoe
+        robot.turnOnIntake(); // Start intake at beginning of sequence
 
-        robot.moveForward(0.40, 1.4);
+        robot.moveForward(0.2, 1.25);
         sleep(500);
 
-        robot.turnLeft(0.50, 2.0);
+        robot.turnLeft(0.25, 2.0);
         sleep(500);
 
-        robot.moveForward(0.50, 2.0);
+        robot.moveForward(0.25, 4.0);
         sleep(500);
 
-        robot.turnOffIntake(); // Stop intake when done
+        robot.turnOffIntake(); // Stop intake at end of sequence
     }
 
-    // Sequence for AprilTag 22 - Runs to completion without interruption
+    // Sequence for AprilTag 22 - Intake runs during entire sequence
     private void executeSequence22() {
         telemetry.addLine("=== EXECUTING SEQUENCE 22 ===");
         telemetry.update();
 
-        robot.turnOnIntake(); // Start intake at beginning
+        robot.turnOnIntake(); // Start intake at beginning of sequence
 
-        robot.moveForward(0.40, 2.0);
+        robot.moveForward(0.2, 4.0);
         sleep(500);
 
-        robot.turnLeft(0.50, 2.0);
-        sleep(500);;
-
-        robot.moveForward(0.50, 2.0);
+        robot.turnLeft(0.25, 2.0);
         sleep(500);
 
-        robot.turnOffIntake(); // Stop intake when done
+        robot.moveForward(0.25, 4.0);
+        sleep(500);
+
+        robot.turnOffIntake(); // Stop intake at end of sequence
     }
 
-    // Sequence for AprilTag 23 - Runs to completion without interruption
+    // Sequence for AprilTag 23 - Intake runs during entire sequence
     private void executeSequence23() {
         telemetry.addLine("=== EXECUTING SEQUENCE 23 ===");
         telemetry.update();
 
-        robot.turnOnIntake(); // Start intake at beginning
+        robot.turnOnIntake(); // Start intake at beginning of sequence
 
-        robot.moveForward(0.40, 2.5);
+        robot.moveForward(0.2, 6.0);
         sleep(500);
 
-        robot.turnLeft(0.50, 2.0);
-        sleep(500);;
-
-        robot.moveForward(0.50, 2.0);
+        robot.turnLeft(0.25, 2.0);
         sleep(500);
 
-        robot.turnOffIntake(); // Stop intake when done
+        robot.moveForward(0.25, 4.8);
+        sleep(500);
+
+        robot.turnOffIntake(); // Stop intake at end of sequence
     }
-
 }
