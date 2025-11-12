@@ -67,7 +67,7 @@ public class KensonStopBotheringMe extends LinearOpMode {
         telemetry.update();
 
         robot.stop();
-        robot.turnOffIntake(); // Make sure intake is off at the end
+        robot.turnOffIntake(); // Make sure intake is off at the end, tresh me
         limelight.stop();
     }
 
@@ -93,7 +93,7 @@ public class KensonStopBotheringMe extends LinearOpMode {
         telemetry.addLine("=== EXECUTING SEQUENCE 21 ===");
         telemetry.update();
 
-        robot.turnOnIntake(); // Start intake at beginning
+        robot.turnOnIntake(); // Start intake at beginning bababoe
 
         robot.moveForward(0.40, 1.4);
         sleep(500);
