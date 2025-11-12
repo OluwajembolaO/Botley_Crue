@@ -13,6 +13,7 @@ public class Driver_1 extends OpMode {
     private DcMotor rearLeftMotor;
     private DcMotor rearRightMotor;
     private DcMotor intake;
+    private DcMotor outtake;
 
     @Override
     public void init() {
@@ -22,6 +23,7 @@ public class Driver_1 extends OpMode {
         rearLeftMotor = hardwareMap.get(DcMotor.class, "motor3");
         rearRightMotor = hardwareMap.get(DcMotor.class, "motor4");
         intake = hardwareMap.get(DcMotor.class, "intake");
+        outtake = hardwareMap.get(DcMotor.class, "outtake");
 
         //Why the reverse? Left side move opposite way from right so I would have to reverse it
         topRightMotor.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -31,12 +33,20 @@ public class Driver_1 extends OpMode {
 
     @Override
     public void loop() {
+        // Intake control - me use left bumper
         intake.setPower(0);
         if (gamepad1.left_bumper){
             intake.setPower(1);
         }
+
+        // Outtake control - me use right bumper
+        outtake.setPower(0);
+        if (gamepad1.right_bumper){
+            outtake.setPower(1);
+        }
+
         double speed = 0.65; // Default 50% power
-        double fwd = -gamepad1.left_stick_x; // forward/back - now using X axis
+        double fwd = -gamepad1.left_stick_x; // forward/back - now using X axis idk dawg
         double str = gamepad1.left_stick_y;  // left/right(Strafe) - now using Y axis
         double rot = -gamepad1.right_stick_x; // rotation from right stick - using original working formula
 
@@ -56,13 +66,13 @@ public class Driver_1 extends OpMode {
         double tRPower = fwd - str + rot;
         double rRPower = fwd + str - rot;
 
-        // Normalize the motor powers
+        // Normalize the motor powers :> YIPEEEEE
         double max = Math.max(1.0, Math.abs(tLPower));
         max = Math.max(max, Math.abs(rLPower));
         max = Math.max(max, Math.abs(tRPower));
         max = Math.max(max, Math.abs(rRPower));
 
-        // Apply normalized power multiplied by speed
+        // Apply normalized power multiplied by speed .-. (too much math imo)
         topLeftMotor.setPower((tLPower / max) * speed);
         topRightMotor.setPower((tRPower / max) * speed);
         rearLeftMotor.setPower((rLPower / max) * speed);
