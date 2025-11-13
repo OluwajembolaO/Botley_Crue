@@ -13,7 +13,8 @@ public class Driver_1 extends OpMode {
     private DcMotor rearLeftMotor;
     private DcMotor rearRightMotor;
     private DcMotor intake;
-    private DcMotor outtake;
+    private DcMotor outtake1;   // Changed from single outtake
+    private DcMotor outtake2;  // Added second outtake motor
 
     @Override
     public void init() {
@@ -23,12 +24,16 @@ public class Driver_1 extends OpMode {
         rearLeftMotor = hardwareMap.get(DcMotor.class, "motor3");
         rearRightMotor = hardwareMap.get(DcMotor.class, "motor4");
         intake = hardwareMap.get(DcMotor.class, "intake");
-        outtake = hardwareMap.get(DcMotor.class, "outtake");
+        outtake1 = hardwareMap.get(DcMotor.class, "outtake1");
+        outtake2 = hardwareMap.get(DcMotor.class, "outtake2");
 
         //Why the reverse? Left side move opposite way from right so I would have to reverse it
         topRightMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         rearRightMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         intake.setDirection(DcMotorSimple.Direction.REVERSE);
+
+        // Reverse one outtake motor so they spin opposite directions
+        outtake2.setDirection(DcMotorSimple.Direction.REVERSE);
     }
 
     @Override
@@ -40,9 +45,12 @@ public class Driver_1 extends OpMode {
         }
 
         // Outtake control - me use right bumper
-        outtake.setPower(0);
+        // Both motors run at same power but opposite directions
+        outtake1.setPower(0);
+        outtake2.setPower(0);
         if (gamepad1.right_bumper){
-            outtake.setPower(1);
+            outtake1.setPower(1);
+            outtake2.setPower(1);  // Will spin opposite due to setDirection
         }
 
         double speed = 0.65; // Default 50% power
