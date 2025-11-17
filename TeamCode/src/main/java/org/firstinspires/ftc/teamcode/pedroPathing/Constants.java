@@ -16,13 +16,14 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 public class Constants {
     public static FollowerConstants followerConstants = new FollowerConstants()
-            .mass(0) // Mass of robot (in Kilograms)
+            .mass(12) // Mass of robot (in Kilograms)
             //TODO
-            //.forwardZeroPowerAcceleration(0)
-            //.lateralZeroPowerAcceleration(0)
-            //.translationalPIDFCoefficients(new PIDFCoefficients(0,0,0,0)) //Its on PIDF on pp thing
-            //.drivePIDFCoefficients(new FilteredPIDFCoefficients(0,0,0,0)) //Also on thing
-            .centripetalScaling(0.000)
+            .forwardZeroPowerAcceleration(-227.43694636130985)
+            .lateralZeroPowerAcceleration(-84.23361789420737)
+            .translationalPIDFCoefficients(new PIDFCoefficients(0.065,0,0.0015,0.03)) //Its on PIDF on pp thing
+            .headingPIDFCoefficients(new PIDFCoefficients(.715, 0, 0.0025, 0.03 ))
+            .drivePIDFCoefficients(new FilteredPIDFCoefficients(.6,0,0.0001,0.6, 0.025)) //Also on thing
+            .centripetalScaling(0.005)
     ;
 
 
@@ -36,18 +37,17 @@ public class Constants {
             //TODO: Figure out which motors needs to be reversed 5:50 on the video - Jem
 
             .leftFrontMotorDirection(DcMotorSimple.Direction.REVERSE)
-            .leftRearMotorDirection(DcMotorSimple.Direction.REVERSE)
-            .rightFrontMotorDirection(DcMotorSimple.Direction.FORWARD)
+            .leftRearMotorDirection(DcMotorSimple.Direction.FORWARD)
+            .rightFrontMotorDirection(DcMotorSimple.Direction.REVERSE)
             .rightRearMotorDirection(DcMotorSimple.Direction.FORWARD)
             //TODO A lot of testing - Jem
-            //.xVelocity(0)
-            //.yVelocity(0)
+            .xVelocity(76.54722342904158)
+            .yVelocity(65.90605463944084)
             ;
-
     public static PinpointConstants localizerConstants = new PinpointConstants()
             //TODO: I need to tune this - Jem
             .forwardPodY(-5)
-            .strafePodX(0.5)
+            .strafePodX(4.5)
 
             .distanceUnit(DistanceUnit.INCH) //Change units
             .hardwareMapName("pinpoint") //Change Name
@@ -55,14 +55,14 @@ public class Constants {
             .encoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD)
 
             //TODO Test encoders up +x left +y vice-versa -Jem
-            .forwardEncoderDirection(GoBildaPinpointDriver.EncoderDirection.FORWARD)
-            .strafeEncoderDirection(GoBildaPinpointDriver.EncoderDirection.FORWARD);
+            .forwardEncoderDirection(GoBildaPinpointDriver.EncoderDirection.REVERSED)
+            .strafeEncoderDirection(GoBildaPinpointDriver.EncoderDirection.REVERSED);
 
 
     public static PathConstraints pathConstraints = new PathConstraints(
             0.99,
             100,
-            1,
+            1.4,
             1);
 
     public static Follower createFollower(HardwareMap hardwareMap) {

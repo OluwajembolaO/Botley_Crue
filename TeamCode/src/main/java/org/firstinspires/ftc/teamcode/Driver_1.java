@@ -33,7 +33,7 @@ public class Driver_1 extends OpMode {
         intake.setDirection(DcMotorSimple.Direction.REVERSE);
 
         // Reverse one outtake motor so they spin opposite directions
-        outtake2.setDirection(DcMotorSimple.Direction.REVERSE);
+        outtake1.setDirection(DcMotorSimple.Direction.REVERSE);
     }
 
     @Override
