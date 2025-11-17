@@ -6,7 +6,8 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 @TeleOp(name="Driver2")
-public class Driver_2 extends OpMode {
+public class
+Driver_2 extends OpMode {
     //Represents the 4 motors I know we are probably using like 6-8 motors but this is just the basics
     private DcMotor topLeftMotor;
     private DcMotor topRightMotor;
