@@ -18,8 +18,8 @@ public class Constants {
     public static FollowerConstants followerConstants = new FollowerConstants()
             .mass(12) // Mass of robot (in Kilograms)
             //TODO
-            .forwardZeroPowerAcceleration(-227.43694636130985)
-            .lateralZeroPowerAcceleration(-84.23361789420737)
+            .forwardZeroPowerAcceleration(-22.05326607710397)
+            .lateralZeroPowerAcceleration(-298.0191190051714)
             .translationalPIDFCoefficients(new PIDFCoefficients(0.065,0,0.0015,0.03)) //Its on PIDF on pp thing
             .headingPIDFCoefficients(new PIDFCoefficients(.715, 0, 0.0025, 0.03 ))
             .drivePIDFCoefficients(new FilteredPIDFCoefficients(.6,0,0.0001,0.6, 0.025)) //Also on thing
@@ -41,8 +41,8 @@ public class Constants {
             .rightFrontMotorDirection(DcMotorSimple.Direction.REVERSE)
             .rightRearMotorDirection(DcMotorSimple.Direction.FORWARD)
             //TODO A lot of testing - Jem
-            .xVelocity(76.54722342904158)
-            .yVelocity(65.90605463944084)
+            .xVelocity(81.11001562884476)
+            .yVelocity(90.06744504913571)
             ;
     public static PinpointConstants localizerConstants = new PinpointConstants()
             //TODO: I need to tune this - Jem

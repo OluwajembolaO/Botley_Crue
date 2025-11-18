@@ -27,10 +27,9 @@ public class Driver_1 extends OpMode {
         outtake1 = hardwareMap.get(DcMotor.class, "outtake1");
         outtake2 = hardwareMap.get(DcMotor.class, "outtake2");
 
-        //Why the reverse? Left side move opposite way from right so I would have to reverse it
+        //Why the reverse? Left side move opposite way from right so I would have to reverse ita
         topRightMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         rearRightMotor.setDirection(DcMotorSimple.Direction.REVERSE);
-        intake.setDirection(DcMotorSimple.Direction.REVERSE);
 
         // Reverse one outtake motor so they spin opposite directions
         outtake1.setDirection(DcMotorSimple.Direction.REVERSE);
