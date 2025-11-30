@@ -27,12 +27,17 @@ public class Driver_1 extends OpMode {
         outtake1 = hardwareMap.get(DcMotor.class, "outtake1");
         outtake2 = hardwareMap.get(DcMotor.class, "outtake2");
 
-        // right side motors naturally go backwards so we flip em
         topRightMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         rearRightMotor.setDirection(DcMotorSimple.Direction.REVERSE);
-
-        // make one outtake spin the other way so they work together
         outtake1.setDirection(DcMotorSimple.Direction.REVERSE);
+
+        // ADD THESE - huge improvement for competition!
+        topLeftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        topRightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rearLeftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rearRightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+
     }
 
     @Override
