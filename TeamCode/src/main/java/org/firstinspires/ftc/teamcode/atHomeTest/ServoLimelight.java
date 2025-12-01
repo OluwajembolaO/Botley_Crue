@@ -76,7 +76,7 @@ public class ServoLimelight extends OpMode {
         rearRightMotor.setDirection(DcMotorSimple.Direction.REVERSE);
 
         // Make one outtake spin the other way so they work together
-        outtake1.setDirection(DcMotorSimple.Direction.REVERSE);
+
 
         // Set brake behavior
         topLeftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);

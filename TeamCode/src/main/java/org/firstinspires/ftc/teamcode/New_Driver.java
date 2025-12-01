@@ -25,7 +25,7 @@ public class New_Driver extends OpMode {
 
     // Intake/Outtake constantssss :)
     private static final double INTAKE_POWER = 1.0;
-    private static final double OUTTAKE_POWER = 1.0;
+    private static final double OUTTAKE_POWER = .75;
 
     @Override
     public void init() {
@@ -42,7 +42,7 @@ public class New_Driver extends OpMode {
         topRightMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         rearRightMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         outtake1.setDirection(DcMotorSimple.Direction.REVERSE);
-
+        outtake2.setDirection(DcMotorSimple.Direction.REVERSE);
         // BRAKE mode - robot stops instantly instead of coasting
         topLeftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         topRightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
