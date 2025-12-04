@@ -1,9 +1,13 @@
 package org.firstinspires.ftc.teamcode.TeleOps;
 
+import com.qualcomm.hardware.limelightvision.LLResult;
+import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 @TeleOp(name="Driver2")
 public class Driver_2 extends OpMode {
@@ -13,133 +17,268 @@ public class Driver_2 extends OpMode {
     private DcMotor rearLeftMotor;
     private DcMotor rearRightMotor;
 
-    // Intake/outtake motors for gamepad 2
+    // Intake/outtake/transfer motors for gamepad 2
     private DcMotor intake;
-    private DcMotor outtake1;
-    private DcMotor outtake2;
+    private DcMotor transfer;
+    private DcMotorEx outtake1;
+    private DcMotorEx outtake2;
 
-    // Outtake speed stuff - starts at 50% so we don't blow anything up lol
-    private double outtakeSpeed = 0.5;
-    private final double SPEED_INCREMENT = 0.1; // goes up/down by 10% each press
-    private final double MIN_SPEED = 0.3; // don't go below 30% or it's kinda useless
-    private final double MAX_SPEED = 1.0; // full send mode
+    // Limelight for autolock
+    private Limelight3A limelight;
 
-    // These stop you from spamming buttons and breaking everything
+    // Speed constants - easy to tune
+    private static final double NORMAL_SPEED = 0.65;
+    private static final double SLOW_SPEED = 0.4;
+    private static final double FAST_SPEED = 0.9;
+    private static final double TRIGGER_THRESHOLD = 0.5;
+    private static final double ROTATION_MULTIPLIER = 0.7;
+
+    // Intake/Transfer constants
+    private static final double INTAKE_POWER = 0.5;
+    private static final double TRANSFER_POWER = 1.0;
+
+    // Outtake RPM control constants
+    private static final double TICKS_PER_REV = 6000.0;
+    private static final double GEAR_RATIO = 1.0;
+    private double targetRPM = 4000;
+    private static final double RPM_INCREMENT = 100;
+    private static final double MAX_RPM = 6000;
+    private static final double MIN_RPM = 0;
+    private static final double RPM_TOLERANCE = 200; // RPM within this range = at target
+
+    // Autolock constants
+    private static final double AUTOLOCK_KP = 0.03; // Proportional gain for rotation correction
+    private static final double AUTOLOCK_TOLERANCE = 3.0; // degrees
+    private static final double MAX_AUTOLOCK_ROTATION = 0.5; // Max rotation speed during autolock
+    private static final double MIN_AUTOLOCK_ROTATION = 0.1; // Min rotation speed to overcome friction
+
+    // Button state tracking
     private boolean dpadUpPressed = false;
     private boolean dpadDownPressed = false;
+    private boolean autoLockActive = false;
+    private boolean r3WasPressed = false;
+
+    private ElapsedTime timer = new ElapsedTime();
 
     @Override
     public void init() {
-        // grab all the motors from config
+        // Initialize drive motors
         topLeftMotor = hardwareMap.get(DcMotor.class, "motor1");
         topRightMotor = hardwareMap.get(DcMotor.class, "motor2");
         rearLeftMotor = hardwareMap.get(DcMotor.class, "motor3");
         rearRightMotor = hardwareMap.get(DcMotor.class, "motor4");
 
+        // Initialize intake/transfer/outtake motors
         intake = hardwareMap.get(DcMotor.class, "intake");
-        outtake1 = hardwareMap.get(DcMotor.class, "outtake1");
-        outtake2 = hardwareMap.get(DcMotor.class, "outtake2");
+        transfer = hardwareMap.get(DcMotor.class, "transfer");
+        outtake1 = hardwareMap.get(DcMotorEx.class, "outtake1");
+        outtake2 = hardwareMap.get(DcMotorEx.class, "outtake2");
 
-        // right side motors go backwards normally so we flip em
+        // Initialize Limelight
+        limelight = hardwareMap.get(Limelight3A.class, "limelight");
+
+        // Set motor directions
         topRightMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         rearRightMotor.setDirection(DcMotorSimple.Direction.REVERSE);
-
-        // make one outtake spin the other way so they work together
         outtake1.setDirection(DcMotorSimple.Direction.REVERSE);
+        outtake2.setDirection(DcMotorSimple.Direction.REVERSE);
 
-        telemetry.addData("Status", "Initialized");
-        telemetry.addData("Outtake Speed", "%.0f%%", outtakeSpeed * 100);
+        // Enable built-in velocity PID on outtake motors
+        outtake1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        outtake2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        // Float for flywheels (shooting)
+        outtake1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        outtake2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+
+        // BRAKE mode - robot stops instantly instead of coasting
+        topLeftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        topRightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rearLeftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rearRightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+        telemetry.addLine("Driver2 Initialized");
+        telemetry.addLine("Gamepad 1: Drive");
+        telemetry.addLine("Gamepad 2: Intake/Transfer/Outtake + Autolock (LT)");
+        telemetry.addData("Target RPM", targetRPM);
         telemetry.update();
     }
 
     @Override
+    public void start() {
+        limelight.pipelineSwitch(8);
+        limelight.start();
+        timer.reset();
+    }
+
+    @Override
     public void loop() {
-        // ========== GAMEPAD 1: DRIVING STUFF ==========
-        double speed = 0.65; // normal speed
-        double fwd = -gamepad1.left_stick_x; // forward/back
-        double str = gamepad1.left_stick_y;  // side to side
-        double rot = -gamepad1.right_stick_x; // spinning
+        // ========== AUTOLOCK TOGGLE (Gamepad 2 Left Trigger) ==========
 
-        float lt = gamepad1.left_trigger;   // slow mode
-        float rt = gamepad1.right_trigger;  // zoom mode
-
-        // triggers change how fast we go
-        if(lt > 0.5) {
-            speed = 0.4; // chill mode
+        // Toggle autolock with gamepad2 left trigger
+        boolean ltIsPressed = gamepad2.left_trigger > TRIGGER_THRESHOLD;
+        if (ltIsPressed && !r3WasPressed) {
+            autoLockActive = !autoLockActive;
         }
-        if(rt > 0.5) {
-            speed = 0.9; // gotta go fast
+        r3WasPressed = ltIsPressed;
+
+        // ========== GAMEPAD 1: DRIVING ==========
+
+        // Get controller inputs for driving
+        double fwd = -gamepad1.left_stick_x;  // strafe
+        double str = gamepad1.left_stick_y;   // forward/back
+        double rot = -gamepad1.right_stick_x * ROTATION_MULTIPLIER;
+
+        // Determine speed based on triggers
+        double speed = NORMAL_SPEED;
+        if (gamepad1.left_trigger > TRIGGER_THRESHOLD) {
+            speed = SLOW_SPEED;
+        }
+        if (gamepad1.right_trigger > TRIGGER_THRESHOLD) {
+            speed = FAST_SPEED;
         }
 
-        // mecanum drive math (don't touch this unless you know what you're doing)
+        // Apply autolock rotation correction if active
+        if (autoLockActive) {
+            LLResult llResult = limelight.getLatestResult();
+
+            if (llResult != null && llResult.isValid()) {
+                double tx = llResult.getTx(); // Horizontal offset in degrees
+
+                if (Math.abs(tx) > AUTOLOCK_TOLERANCE) {
+                    // Calculate rotation correction using proportional control
+                    double rotationCorrection = tx * AUTOLOCK_KP;
+
+                    // Clamp rotation correction
+                    rotationCorrection = Math.max(-MAX_AUTOLOCK_ROTATION,
+                                                  Math.min(MAX_AUTOLOCK_ROTATION, rotationCorrection));
+
+                    // Apply minimum rotation speed to overcome friction
+                    if (Math.abs(rotationCorrection) > 0 && Math.abs(rotationCorrection) < MIN_AUTOLOCK_ROTATION) {
+                        rotationCorrection = Math.signum(rotationCorrection) * MIN_AUTOLOCK_ROTATION;
+                    }
+
+                    // Override manual rotation with autolock correction
+                    rot = -rotationCorrection; // Negative because tx positive means turn right
+
+                    telemetry.addLine("🔒 AUTOLOCK ACTIVE - TRACKING 🔒");
+                    telemetry.addData("Target Error", "%.2f°", tx);
+                    telemetry.addData("Rotation Correction", "%.3f", rotationCorrection);
+                } else {
+                    // Locked on target
+                    rot = 0; // Stop rotation
+                    gamepad1.rumble(100); // Vibrate controller
+                    telemetry.addLine("🔒 AUTOLOCK ACTIVE - LOCKED ✓✓✓");
+                    telemetry.addData("Target Error", "%.2f°", tx);
+                }
+            } else {
+                // No target detected
+                telemetry.addLine("🔒 AUTOLOCK ACTIVE - NO TARGET ⚠");
+                telemetry.addLine("Manual control available");
+            }
+        }
+
+        // Mecanum drive calculations
         double tLPower = fwd + str + rot;
         double rLPower = fwd - str - rot;
         double tRPower = fwd - str + rot;
         double rRPower = fwd + str - rot;
 
-        // makes sure motors don't try to go over 100%
-        double max = Math.max(1.0, Math.abs(tLPower));
-        max = Math.max(max, Math.abs(rLPower));
+        // Normalize powers if any exceed 1.0
+        double max = Math.max(Math.abs(tLPower), Math.abs(rLPower));
         max = Math.max(max, Math.abs(tRPower));
         max = Math.max(max, Math.abs(rRPower));
 
-        // actually make the motors go
-        topLeftMotor.setPower((tLPower / max) * speed);
-        topRightMotor.setPower((tRPower / max) * speed);
-        rearLeftMotor.setPower((rLPower / max) * speed);
-        rearRightMotor.setPower((rRPower / max) * speed);
+        if (max > 1.0) {
+            tLPower /= max;
+            rLPower /= max;
+            tRPower /= max;
+            rRPower /= max;
+        }
 
-        // ========== GAMEPAD 2: INTAKE/OUTTAKE CONTROLS ==========
+        // Set motor powers
+        topLeftMotor.setPower(tLPower * speed);
+        topRightMotor.setPower(tRPower * speed);
+        rearLeftMotor.setPower(rLPower * speed);
+        rearRightMotor.setPower(rRPower * speed);
 
-        // left bumper = intake go brrr
+        // ========== GAMEPAD 2: INTAKE/TRANSFER/OUTTAKE CONTROLS ==========
+
+        // Intake control - Left bumper (forward) and Square (reverse)
         if (gamepad2.left_bumper) {
-            intake.setPower(1.0);
-        } else if (gamepad2.left_trigger > 0.5) {
-            // left trigger = oops wrong way
-            intake.setPower(-1.0);
+            intake.setPower(INTAKE_POWER);
+        } else if (gamepad2.x) {  // Square button (X on Xbox)
+            intake.setPower(-INTAKE_POWER);
         } else {
             intake.setPower(0);
         }
 
-        // dpad up/down = make outtake faster/slower (just in case you guys are slow)
+        // Transfer control - Right trigger
+        if (gamepad2.right_trigger > TRIGGER_THRESHOLD) {
+            transfer.setPower(TRANSFER_POWER);
+        } else {
+            transfer.setPower(0);
+        }
+
+        // RPM adjustment with dpad
         if (gamepad2.dpad_up && !dpadUpPressed) {
-            outtakeSpeed += SPEED_INCREMENT;
-            if (outtakeSpeed > MAX_SPEED) {
-                outtakeSpeed = MAX_SPEED; // can't go above 100%
-            }
+            targetRPM = Math.min(targetRPM + RPM_INCREMENT, MAX_RPM);
             dpadUpPressed = true;
         } else if (!gamepad2.dpad_up) {
             dpadUpPressed = false;
         }
 
         if (gamepad2.dpad_down && !dpadDownPressed) {
-            outtakeSpeed -= SPEED_INCREMENT;
-            if (outtakeSpeed < MIN_SPEED) {
-                outtakeSpeed = MIN_SPEED; // don't go too slow
-            }
+            targetRPM = Math.max(targetRPM - RPM_INCREMENT, MIN_RPM);
             dpadDownPressed = true;
         } else if (!gamepad2.dpad_down) {
             dpadDownPressed = false;
         }
 
-        // right bumper = outtake go brrr at whatever speed we set
+        // Calculate target velocity in ticks per second
+        double targetTicksPerSec = (targetRPM * TICKS_PER_REV * GEAR_RATIO) / 60.0;
+
+        // Outtake control - Right bumper only
         if (gamepad2.right_bumper) {
-            outtake1.setPower(outtakeSpeed);
-            outtake2.setPower(outtakeSpeed);
-        } else if (gamepad2.right_trigger > 0.5) {
-            // right trigger = reverse outtake if you messed up
-            outtake1.setPower(-outtakeSpeed);
-            outtake2.setPower(-outtakeSpeed);
+            outtake1.setVelocity(targetTicksPerSec);
+            outtake2.setVelocity(targetTicksPerSec);
         } else {
-            outtake1.setPower(0);
-            outtake2.setPower(0);
+            outtake1.setVelocity(0);
+            outtake2.setVelocity(0);
         }
 
-        // shows stuff on the driver station so you know what's happening
-        telemetry.addData("Drive Speed", "%.0f%%", speed * 100);
-        telemetry.addData("Outtake Speed", "%.0f%%", outtakeSpeed * 100);
-        telemetry.addData("Intake Active", gamepad2.left_bumper);
-        telemetry.addData("Outtake Active", gamepad2.right_bumper);
+        // Calculate actual RPM for telemetry
+        double rpm1 = (outtake1.getVelocity() / TICKS_PER_REV / GEAR_RATIO) * 60;
+        double rpm2 = (outtake2.getVelocity() / TICKS_PER_REV / GEAR_RATIO) * 60;
+
+        // Check if outtake is at target RPM and vibrate both gamepads
+        boolean atTargetRPM = false;
+        if (gamepad2.right_bumper && targetRPM > 0) {
+            double avgRPM = (rpm1 + rpm2) / 2.0;
+            if (Math.abs(avgRPM - targetRPM) <= RPM_TOLERANCE) {
+                atTargetRPM = true;
+                gamepad1.rumble(50);  // Small vibration for gamepad 1
+                gamepad2.rumble(50);  // Small vibration for gamepad 2
+            }
+        }
+
+        // Telemetry
+        telemetry.addLine("=== DRIVE ===");
+        telemetry.addData("Speed Mode", speed == SLOW_SPEED ? "SLOW" : speed == FAST_SPEED ? "FAST" : "NORMAL");
+        telemetry.addData("Autolock", autoLockActive ? "🔒 ON (GP2 LT to toggle)" : "OFF (GP2 LT to toggle)");
+        telemetry.addLine();
+        telemetry.addLine("=== INTAKE/TRANSFER/OUTTAKE ===");
+        telemetry.addData("Intake", gamepad2.left_bumper ? "FORWARD (50%)" : gamepad2.x ? "REVERSE (50%)" : "OFF");
+        telemetry.addData("Transfer", gamepad2.right_trigger > TRIGGER_THRESHOLD ? "RUNNING" : "OFF");
+        telemetry.addData("Target RPM", "%.0f (D-pad to adjust)", targetRPM);
+        telemetry.addData("Actual RPM", "%.0f / %.0f", rpm1, rpm2);
+        telemetry.addData("Outtake", gamepad2.right_bumper ? "SPINNING" : "OFF");
+        telemetry.addData("RPM Status", atTargetRPM ? "✓ AT TARGET" : "...");
         telemetry.update();
+    }
+
+    @Override
+    public void stop() {
+        limelight.stop();
     }
 }

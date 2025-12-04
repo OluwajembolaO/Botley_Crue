@@ -45,3 +45,48 @@ and I'll try my best to answer confusing questions as I learn myself." - Jem 8:4
 
 
 
+Pedro Check
+
+// PRE RUN CHECKLIST
+// 1. Hardware
+// Wheels tight
+// Mecanum rollers spin smooth
+// Odometry pods fully down and touching the floor
+// No loose or dragging wires
+//
+// 2. Battery
+// REV flat battery between 12.5 and 13.0 volts
+// Do not run tuning under 12.0 volts
+//
+// 3. Sensors and pose
+// Reset drive motor encoders
+// Reset odometry encoders
+// Zero IMU or gyro
+// Zero Pinpoint pose to (0, 0, 0) on the start tile
+//
+// 4. Field or hallway setup
+// Tape a clear start line
+// Mark target distances on the floor
+// Clear all obstacles on the path
+//
+// 5. Robot weight
+// All match hardware installed
+// Extra weight for any game piece if needed
+//
+// 6. Connection check
+// Driver Hub linked to robot
+// Gamepads linked and stable
+// Quick teleop test with no lag
+//
+// 7. Warm up drive
+// Run teleop for 30 to 60 seconds
+// Forward, back, strafe, turn
+// Confirm smooth motion
+//
+// 8. Before every single run
+// Place robot on the start line in the same orientation
+// Call pose reset to the same start pose
+// Confirm voltage still in chosen range
+// Confirm odometry pods still touch the floor
+
+
