@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.TeleOps;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 @TeleOp(name="NewDriver")
@@ -13,8 +14,8 @@ public class New_Driver extends OpMode {
     private DcMotor rearLeftMotor;
     private DcMotor rearRightMotor;
     private DcMotor intake;
-    private DcMotor outtake1;
-    private DcMotor outtake2;
+    private DcMotorEx outtake1;
+    private DcMotorEx outtake2;
 
     // Speed constants to tune easily, i get lazy :3
     private static final double NORMAL_SPEED = 0.65;
@@ -25,7 +26,23 @@ public class New_Driver extends OpMode {
 
     // Intake/Outtake constantssss :)
     private static final double INTAKE_POWER = 1.0;
-    private static final double OUTTAKE_POWER = .75;
+
+    private  static  final double TICKS_PER_REV = 6000.0;
+    private static final double GEAR_RATIO = 1.0;
+
+    //Change from final
+    private double targetRPM = 4000;
+    private static final double RPM_INCREMENT = 100;
+    private static final double MAX_RPM = 6000;
+    private static final double MIN_RPM = 0;
+
+    private boolean dpadUpPressed = false;
+    private boolean dpadDownPressed = false;
+
+
+    private static final double TARGET_RPM = 4000;
+    private static final double TARGET_TICKS_PER_SEC = (TARGET_RPM * TICKS_PER_REV * GEAR_RATIO) / 60.0;
+//    private static final double OUTTAKE_POWER = .75;
 
     @Override
     public void init() {
@@ -35,28 +52,60 @@ public class New_Driver extends OpMode {
         rearLeftMotor = hardwareMap.get(DcMotor.class, "motor3");
         rearRightMotor = hardwareMap.get(DcMotor.class, "motor4");
         intake = hardwareMap.get(DcMotor.class, "intake");
-        outtake1 = hardwareMap.get(DcMotor.class, "outtake1");
-        outtake2 = hardwareMap.get(DcMotor.class, "outtake2");
+        outtake1 = hardwareMap.get(DcMotorEx.class, "outtake1");
+        outtake2 = hardwareMap.get(DcMotorEx.class, "outtake2");
 
         // Set motor directions
         topRightMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         rearRightMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         outtake1.setDirection(DcMotorSimple.Direction.REVERSE);
         outtake2.setDirection(DcMotorSimple.Direction.REVERSE);
+
+        //enable built-in velocity PID on outtake motors
+        outtake1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        outtake2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        //Float for flywheels (shoting)
+        outtake1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        outtake2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+
         // BRAKE mode - robot stops instantly instead of coasting
         topLeftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         topRightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rearLeftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rearRightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+        telemetry.addLine("Target:" + TARGET_RPM + " RPM");
     }
 
     @Override
     public void loop() {
         // Handle intake/outtake, i learned what a ? means .-.
         intake.setPower(gamepad1.left_bumper ? INTAKE_POWER : 0.0);
-        double outtakePower = gamepad1.right_bumper ? OUTTAKE_POWER : 0.0;
-        outtake1.setPower(outtakePower);
-        outtake2.setPower(outtakePower);
+
+
+        if (gamepad1.dpad_up && !dpadUpPressed){
+            targetRPM = Math.min(targetRPM + RPM_INCREMENT, MAX_RPM);
+        }
+        if (gamepad1.dpad_down && !dpadDownPressed){
+            targetRPM = Math.max(targetRPM - RPM_INCREMENT, MIN_RPM);
+        }
+
+        dpadUpPressed = gamepad1.dpad_up;
+        dpadDownPressed = gamepad1.dpad_down;
+
+
+        double targetTicksPerSec = (targetRPM * TICKS_PER_REV * GEAR_RATIO) / 60.0;
+
+        if (gamepad1.right_bumper){
+            outtake1.setVelocity(targetTicksPerSec);
+            outtake2.setVelocity(targetTicksPerSec);
+        } else{
+            outtake1.setVelocity(0);
+            outtake2.setVelocity(0);
+        }
+
+
 
         // Get controller inputs
         double fwd = -gamepad1.left_stick_x;  // Your strafe
@@ -95,5 +144,15 @@ public class New_Driver extends OpMode {
         topRightMotor.setPower(tRPower * speed);
         rearLeftMotor.setPower(rLPower * speed);
         rearRightMotor.setPower(rRPower * speed);
+
+
+        double rpm1 = (outtake1.getVelocity() / TICKS_PER_REV / GEAR_RATIO) * 60;
+        double rpm2 = (outtake2.getVelocity() / TICKS_PER_REV / GEAR_RATIO) * 60;
+
+        telemetry.addData("Target", "%.0f RPM (D-pad to adjust)", TARGET_RPM);
+        telemetry.addData("Actual", "%.0f / %.0f RPM", rpm1, rpm2);
+        telemetry.addData("Shooter", gamepad1.right_bumper ? "SPINNING" : "OFF");
+        telemetry.update();
+
     }
 }
