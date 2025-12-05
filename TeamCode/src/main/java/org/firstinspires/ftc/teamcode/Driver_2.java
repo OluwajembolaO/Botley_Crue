@@ -17,7 +17,7 @@ public class Driver_2 extends OpMode {
     private DcMotor rearLeftMotor;
     private DcMotor rearRightMotor;
 
-    // Intake/outtake/transfer motors for gamepad 2
+    // Intake/outtake/transfer motors for gamepad 2 hi
     private DcMotor intake;
     private DcMotor transfer;
     private DcMotorEx outtake1;
