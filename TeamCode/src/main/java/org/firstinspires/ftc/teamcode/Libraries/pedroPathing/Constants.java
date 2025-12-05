@@ -16,7 +16,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 public class Constants {
     public static FollowerConstants followerConstants = new FollowerConstants()
-            .mass(0) // Mass of robot (in Kilograms)
+            .mass(12.1) // Mass of robot (in Kilograms)
             //TODO
             //.forwardZeroPowerAcceleration(0)
             //.lateralZeroPowerAcceleration(0)
@@ -56,7 +56,7 @@ public class Constants {
 
             //TODO Test encoders up +x left +y vice-versa -Jem
             .forwardEncoderDirection(GoBildaPinpointDriver.EncoderDirection.FORWARD)
-            .strafeEncoderDirection(GoBildaPinpointDriver.EncoderDirection.FORWARD);
+            .strafeEncoderDirection(GoBildaPinpointDriver.EncoderDirection.REVERSED);
 
 
     public static PathConstraints pathConstraints = new PathConstraints(
