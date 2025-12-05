@@ -17,7 +17,7 @@ public class Driver_2 extends OpMode {
     private DcMotor rearLeftMotor;
     private DcMotor rearRightMotor;
 
-    // Intake/outtake/transfer motors for gamepad 2
+    // Intake/outtake/transfer motors for gamepad 2 hi
     private DcMotor intake;
     private DcMotor transfer;
     private DcMotorEx outtake1;
@@ -34,8 +34,8 @@ public class Driver_2 extends OpMode {
     private static final double ROTATION_MULTIPLIER = 0.7;
 
     // Intake/Transfer constants
-    private static final double INTAKE_POWER = 0.5;
-    private static final double TRANSFER_POWER = 1.0;
+    private static final double INTAKE_POWER = 0.8;
+    private static final double TRANSFER_POWER = 0.7;
 
     // Outtake RPM control constants
     private static final double TICKS_PER_REV = 6000.0;
@@ -81,7 +81,6 @@ public class Driver_2 extends OpMode {
         topRightMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         rearRightMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         outtake1.setDirection(DcMotorSimple.Direction.REVERSE);
-        outtake2.setDirection(DcMotorSimple.Direction.REVERSE);
 
         // Enable built-in velocity PID on outtake motors
         outtake1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -91,11 +90,6 @@ public class Driver_2 extends OpMode {
         outtake1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         outtake2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
 
-        // BRAKE mode - robot stops instantly instead of coasting
-        topLeftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        topRightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        rearLeftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        rearRightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         telemetry.addLine("Driver2 Initialized");
         telemetry.addLine("Gamepad 1: Drive");
@@ -127,7 +121,7 @@ public class Driver_2 extends OpMode {
         // Get controller inputs for driving
         double fwd = -gamepad1.left_stick_x;  // strafe
         double str = gamepad1.left_stick_y;   // forward/back
-        double rot = -gamepad1.right_stick_x * ROTATION_MULTIPLIER;
+        double rot = -gamepad1.right_stick_x;
 
         // Determine speed based on triggers
         double speed = NORMAL_SPEED;
@@ -151,7 +145,7 @@ public class Driver_2 extends OpMode {
 
                     // Clamp rotation correction
                     rotationCorrection = Math.max(-MAX_AUTOLOCK_ROTATION,
-                                                  Math.min(MAX_AUTOLOCK_ROTATION, rotationCorrection));
+                            Math.min(MAX_AUTOLOCK_ROTATION, rotationCorrection));
 
                     // Apply minimum rotation speed to overcome friction
                     if (Math.abs(rotationCorrection) > 0 && Math.abs(rotationCorrection) < MIN_AUTOLOCK_ROTATION) {
@@ -167,7 +161,7 @@ public class Driver_2 extends OpMode {
                 } else {
                     // Locked on target
                     rot = 0; // Stop rotation
-                    gamepad1.rumble(100); // Vibrate controller
+                    gamepad2.rumble(100); // Vibrate controller
                     telemetry.addLine("🔒 AUTOLOCK ACTIVE - LOCKED ✓✓✓");
                     telemetry.addData("Target Error", "%.2f°", tx);
                 }
