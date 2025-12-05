@@ -34,8 +34,8 @@ public class Driver_2 extends OpMode {
     private static final double ROTATION_MULTIPLIER = 0.7;
 
     // Intake/Transfer constants
-    private static final double INTAKE_POWER = 0.8;
-    private static final double TRANSFER_POWER = 0.7;
+    private static final double INTAKE_POWER = 0.5;
+    private static final double TRANSFER_POWER = 0.9;
 
     // Outtake RPM control constants
     private static final double TICKS_PER_REV = 6000.0;
@@ -57,6 +57,8 @@ public class Driver_2 extends OpMode {
     private boolean dpadDownPressed = false;
     private boolean autoLockActive = false;
     private boolean r3WasPressed = false;
+    private boolean intakeActive = false;
+    private boolean leftBumperWasPressed = false;
 
     private ElapsedTime timer = new ElapsedTime();
 
@@ -198,11 +200,21 @@ public class Driver_2 extends OpMode {
 
         // ========== GAMEPAD 2: INTAKE/TRANSFER/OUTTAKE CONTROLS ==========
 
-        // Intake control - Left bumper (forward) and Square (reverse)
-        if (gamepad2.left_bumper) {
+        // Intake control - Left bumper toggles forward, Square turns off
+        boolean leftBumperIsPressed = gamepad2.left_bumper;
+
+        // Toggle intake on/off with left bumper (edge detection)
+        if (leftBumperIsPressed && !leftBumperWasPressed) {
+            intakeActive = !intakeActive;
+        }
+        leftBumperWasPressed = leftBumperIsPressed;
+
+        // Apply intake power based on toggle state
+        if (intakeActive) {
             intake.setPower(INTAKE_POWER);
-        } else if (gamepad2.x) {  // Square button (X on Xbox)
+        } else if (gamepad2.x) {  // Square button (X on Xbox) - reverse
             intake.setPower(-INTAKE_POWER);
+            intakeActive = false;  // Turn off toggle if reversing
         } else {
             intake.setPower(0);
         }
@@ -262,7 +274,7 @@ public class Driver_2 extends OpMode {
         telemetry.addData("Autolock", autoLockActive ? "🔒 ON (GP2 LT to toggle)" : "OFF (GP2 LT to toggle)");
         telemetry.addLine();
         telemetry.addLine("=== INTAKE/TRANSFER/OUTTAKE ===");
-        telemetry.addData("Intake", gamepad2.left_bumper ? "FORWARD (50%)" : gamepad2.x ? "REVERSE (50%)" : "OFF");
+        telemetry.addData("Intake", intakeActive ? "ON (TOGGLE)" : gamepad2.x ? "REVERSE" : "OFF");
         telemetry.addData("Transfer", gamepad2.right_trigger > TRIGGER_THRESHOLD ? "RUNNING" : "OFF");
         telemetry.addData("Target RPM", "%.0f (D-pad to adjust)", targetRPM);
         telemetry.addData("Actual RPM", "%.0f / %.0f", rpm1, rpm2);
