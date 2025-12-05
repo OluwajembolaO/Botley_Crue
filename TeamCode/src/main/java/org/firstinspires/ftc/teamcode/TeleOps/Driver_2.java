@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.TeleOps;
 
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
@@ -17,7 +17,7 @@ public class Driver_2 extends OpMode {
     private DcMotor rearLeftMotor;
     private DcMotor rearRightMotor;
 
-    // Intake/outtake/transfer motors for gamepad 2 hi
+    // Intake/outtake/transfer motors for gamepad 2
     private DcMotor intake;
     private DcMotor transfer;
     private DcMotorEx outtake1;
