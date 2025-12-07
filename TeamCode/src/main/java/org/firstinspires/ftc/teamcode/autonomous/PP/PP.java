@@ -15,8 +15,9 @@ import org.firstinspires.ftc.teamcode.Libraries.pedroPathing.Constants;
 
 @Autonomous(name = "PP - Comp Auto", group = "Competition")
 public class PP extends OpMode {
+
     private Follower follower;
-    private Timer pathTimer, opModeTimer;
+    private Timer pathTimer, opModeTimer, shootTimer;
 
     // Intake/Transfer/Outtake motors
     private DcMotor intake;
@@ -29,246 +30,78 @@ public class PP extends OpMode {
     private static final double GEAR_RATIO = 1.0;
     private static final double TARGET_RPM = 4000;
     private static final double RPM_TOLERANCE = 200;
-    private static final double SPINUP_TIME = 1.5; // seconds to spin up flywheels
-    private static final double TRANSFER_TIME = 1.0; // seconds to run transfer motor
+    private static final double SPINUP_TIME = 1.5;    // seconds to spin up flywheels
+    private static final double TRANSFER_TIME = 1.0;  // seconds to run transfer motor
     private static final double INTAKE_POWER = 0.5;
     private static final double TRANSFER_POWER = 1.0;
 
     public enum PathState {
-        //START POS_END POS
-        //DRIVE > MOVEMENT STATE
-        //SHOOT > ATTEMPT TO SCORE ARTIFACTS
-
-        DRIVE_STARTPOS_SHOOTPOS,
-        SHOOT_PRELOAD,
-
-        DRIVE_TO_POINT2,
-        DRIVE_TO_BALL1,
-        DRIVE_BALL1_TO_SHOOTPOS,
-        SHOOT_BATCH1,
-
-        DRIVE_TO_POINT5,
-        DRIVE_TO_BALL2,
-        DRIVE_BALL2_TO_SHOOTPOS,
-        SHOOT_BATCH2,
-
-        DRIVE_TO_POINT8,
-        DRIVE_TO_BALL3,
-        DRIVE_BALL3_TO_SHOOTPOS,
-        SHOOT_BATCH3,
-
+        DRIVE_TO_SHOOT,
+        SHOOT_BALLS,
+        DRIVE_TO_PARK,
         DONE
     }
 
     public enum ShootingState {
-        SPINUP,     // Spinning up flywheels to target RPM
-        TRANSFER,   // Running transfer motor to shoot
-        COMPLETE    // Shooting sequence complete
+        IDLE,      // Not currently shooting
+        SPINUP,    // Spinning up flywheels to target RPM
+        TRANSFER,  // Running transfer motor to shoot
+        COMPLETE   // Shooting sequence complete
     }
 
     PathState pathState;
     ShootingState shootingState;
-    private final Pose startPose = new Pose(23.10763209393346, 119.48336594911936, Math.toRadians(135));
-    private final Pose shootPose = new Pose(50.16046966731898, 92.43052837573384, Math.toRadians(135));
-    private final Pose point2 = new Pose(45.36986301369863, 84.54011741682974, Math.toRadians(180));
-    private final Pose ballPose1 = new Pose(18.59882583170254, 84.54011741682974, Math.toRadians(180));
-    private final Pose point5 = new Pose(42.833659491193735, 60.023483365949126, Math.toRadians(180));
-    private final Pose ballPose2 = new Pose(19.471624266144815, 60.023483365949126, Math.toRadians(180));
-    private final Pose point8 = new Pose(43.3972602739726, 35.22504892367907, Math.toRadians(180));
-    private final Pose ballPose3 = new Pose(18.880626223091976, 35.22504892367907, Math.toRadians(180));
 
-    private PathChain driveStartPosShootPos;
-    private PathChain driveToPoint2, driveToBall1, driveBall1ToShootPos;
-    private PathChain driveToPoint5, driveToBall2, driveBall2ToShootPos;
-    private PathChain driveToPoint8, driveToBall3, driveBall3ToShootPos;
-    public void buildPaths(){
-        // Initial path: Start -> Shoot Position
-        driveStartPosShootPos = follower.pathBuilder()
+    private final Pose startPose = new Pose(23.10763209393346, 119.48336594911936, Math.toRadians(135));
+    private final Pose shootPose = new Pose(35.788649706457925, 107.36594911937378, Math.toRadians(135));
+    private final Pose parkPose = new Pose(71.57729941291585, 132.44618395303328, Math.toRadians(270));
+
+    private PathChain driveToShoot;
+    private PathChain driveToPark;
+
+    public void buildPaths() {
+        // Path 1: Start -> Shoot Position
+        driveToShoot = follower.pathBuilder()
                 .addPath(new BezierLine(startPose, shootPose))
                 .setLinearHeadingInterpolation(startPose.getHeading(), shootPose.getHeading())
                 .build();
 
-        // Batch 1: Shoot Pos -> Point 2 -> Ball 1 -> Shoot Pos
-        driveToPoint2 = follower.pathBuilder()
-                .addPath(new BezierLine(shootPose, point2))
-                .setLinearHeadingInterpolation(shootPose.getHeading(), point2.getHeading())
-                .build();
-
-        driveToBall1 = follower.pathBuilder()
-                .addPath(new BezierLine(point2, ballPose1))
-                .setLinearHeadingInterpolation(point2.getHeading(), ballPose1.getHeading())
-                .build();
-
-        driveBall1ToShootPos = follower.pathBuilder()
-                .addPath(new BezierLine(ballPose1, shootPose))
-                .setLinearHeadingInterpolation(ballPose1.getHeading(), shootPose.getHeading())
-                .build();
-
-        // Batch 2: Shoot Pos -> Point 5 -> Ball 2 -> Shoot Pos
-        driveToPoint5 = follower.pathBuilder()
-                .addPath(new BezierLine(shootPose, point5))
-                .setLinearHeadingInterpolation(shootPose.getHeading(), point5.getHeading())
-                .build();
-
-        driveToBall2 = follower.pathBuilder()
-                .addPath(new BezierLine(point5, ballPose2))
-                .setLinearHeadingInterpolation(point5.getHeading(), ballPose2.getHeading())
-                .build();
-
-        driveBall2ToShootPos = follower.pathBuilder()
-                .addPath(new BezierLine(ballPose2, shootPose))
-                .setLinearHeadingInterpolation(ballPose2.getHeading(), shootPose.getHeading())
-                .build();
-
-        // Batch 3: Shoot Pos -> Point 8 -> Ball 3 -> Shoot Pos
-        driveToPoint8 = follower.pathBuilder()
-                .addPath(new BezierLine(shootPose, point8))
-                .setLinearHeadingInterpolation(shootPose.getHeading(), point8.getHeading())
-                .build();
-
-        driveToBall3 = follower.pathBuilder()
-                .addPath(new BezierLine(point8, ballPose3))
-                .setLinearHeadingInterpolation(point8.getHeading(), ballPose3.getHeading())
-                .build();
-
-        driveBall3ToShootPos = follower.pathBuilder()
-                .addPath(new BezierLine(ballPose3, shootPose))
-                .setLinearHeadingInterpolation(ballPose3.getHeading(), shootPose.getHeading())
+        // Path 2: Shoot Position -> Park Position
+        driveToPark = follower.pathBuilder()
+                .addPath(new BezierLine(shootPose, parkPose))
+                .setLinearHeadingInterpolation(shootPose.getHeading(), parkPose.getHeading())
                 .build();
     }
 
-    public void statePathUpdate(){
-        switch(pathState){
-            case DRIVE_STARTPOS_SHOOTPOS:
-                follower.followPath(driveStartPosShootPos, true);
-                setPathState(PathState.SHOOT_PRELOAD);
-                break;
-
-            case SHOOT_PRELOAD:
+    public void statePathUpdate() {
+        switch (pathState) {
+            case DRIVE_TO_SHOOT:
+                // Wait for path to complete before transitioning to shooting
                 if (!follower.isBusy()) {
-                    runShootingSequence();
-                    if (shootingState == ShootingState.COMPLETE) {
-                        telemetry.addLine("Shooting Preload - Done");
-                        follower.followPath(driveToPoint2, true);
-                        setPathState(PathState.DRIVE_TO_POINT2);
-                    }
+                    setPathState(PathState.SHOOT_BALLS);
                 }
                 break;
 
-            // Ball Batch 1
-            case DRIVE_TO_POINT2:
-                if (!follower.isBusy()){
-                    follower.followPath(driveToBall1, true);
-                    setPathState(PathState.DRIVE_TO_BALL1);
+            case SHOOT_BALLS:
+                // Run shooting sequence - robot stays stationary until complete
+                runShootingSequence();
+                if (shootingState == ShootingState.COMPLETE) {
+                    telemetry.addLine("Shooting 3 Balls - Done");
+                    follower.followPath(driveToPark, true);
+                    setPathState(PathState.DRIVE_TO_PARK);
                 }
                 break;
 
-            case DRIVE_TO_BALL1:
-                // Run intake while approaching and collecting ball
-                intake.setPower(INTAKE_POWER);
-                if (!follower.isBusy()){
-                    telemetry.addLine("Collecting Ball 1");
-                    follower.followPath(driveBall1ToShootPos, true);
-                    setPathState(PathState.DRIVE_BALL1_TO_SHOOTPOS);
-                }
-                break;
-
-            case DRIVE_BALL1_TO_SHOOTPOS:
-                // Keep intake running to ensure ball is fully collected
-                intake.setPower(INTAKE_POWER);
-                if (!follower.isBusy()){
-                    intake.setPower(0); // Stop intake before shooting
-                    setPathState(PathState.SHOOT_BATCH1);
-                }
-                break;
-
-            case SHOOT_BATCH1:
+            case DRIVE_TO_PARK:
+                // Wait for path to complete
                 if (!follower.isBusy()) {
-                    runShootingSequence();
-                    if (shootingState == ShootingState.COMPLETE) {
-                        telemetry.addLine("Shooting Batch 1 - Done");
-                        follower.followPath(driveToPoint5, true);
-                        setPathState(PathState.DRIVE_TO_POINT5);
-                    }
-                }
-                break;
-
-            // Ball Batch 2
-            case DRIVE_TO_POINT5:
-                if (!follower.isBusy()){
-                    follower.followPath(driveToBall2, true);
-                    setPathState(PathState.DRIVE_TO_BALL2);
-                }
-                break;
-
-            case DRIVE_TO_BALL2:
-                // Run intake while approaching and collecting ball
-                intake.setPower(INTAKE_POWER);
-                if (!follower.isBusy()){
-                    telemetry.addLine("Collecting Ball 2");
-                    follower.followPath(driveBall2ToShootPos, true);
-                    setPathState(PathState.DRIVE_BALL2_TO_SHOOTPOS);
-                }
-                break;
-
-            case DRIVE_BALL2_TO_SHOOTPOS:
-                // Keep intake running to ensure ball is fully collected
-                intake.setPower(INTAKE_POWER);
-                if (!follower.isBusy()){
-                    intake.setPower(0); // Stop intake before shooting
-                    setPathState(PathState.SHOOT_BATCH2);
-                }
-                break;
-
-            case SHOOT_BATCH2:
-                if (!follower.isBusy()) {
-                    runShootingSequence();
-                    if (shootingState == ShootingState.COMPLETE) {
-                        telemetry.addLine("Shooting Batch 2 - Done");
-                        follower.followPath(driveToPoint8, true);
-                        setPathState(PathState.DRIVE_TO_POINT8);
-                    }
-                }
-                break;
-
-            // Ball Batch 3
-            case DRIVE_TO_POINT8:
-                if (!follower.isBusy()){
-                    follower.followPath(driveToBall3, true);
-                    setPathState(PathState.DRIVE_TO_BALL3);
-                }
-                break;
-
-            case DRIVE_TO_BALL3:
-                // Run intake while approaching and collecting ball
-                intake.setPower(INTAKE_POWER);
-                if (!follower.isBusy()){
-                    telemetry.addLine("Collecting Ball 3");
-                    follower.followPath(driveBall3ToShootPos, true);
-                    setPathState(PathState.DRIVE_BALL3_TO_SHOOTPOS);
-                }
-                break;
-
-            case DRIVE_BALL3_TO_SHOOTPOS:
-                // Keep intake running to ensure ball is fully collected
-                intake.setPower(INTAKE_POWER);
-                if (!follower.isBusy()){
-                    intake.setPower(0); // Stop intake before shooting
-                    setPathState(PathState.SHOOT_BATCH3);
-                }
-                break;
-
-            case SHOOT_BATCH3:
-                if (!follower.isBusy()) {
-                    runShootingSequence();
-                    if (shootingState == ShootingState.COMPLETE) {
-                        telemetry.addLine("Shooting Batch 3 - Done");
-                        setPathState(PathState.DONE);
-                    }
+                    setPathState(PathState.DONE);
                 }
                 break;
 
             case DONE:
+                // Stop all motors to be safe
+                stopAllMotors();
                 telemetry.addLine("Autonomous Complete!");
                 break;
 
@@ -278,6 +111,11 @@ public class PP extends OpMode {
         }
     }
 
+    /**
+     * Runs the shooting sequence state machine.
+     * This method should be called repeatedly in the loop until shootingState == COMPLETE.
+     * Uses shootTimer to track timing within the shooting sequence.
+     */
     public void runShootingSequence() {
         // Calculate target velocity in ticks per second
         double targetTicksPerSec = (TARGET_RPM * TICKS_PER_REV * GEAR_RATIO) / 60.0;
@@ -295,15 +133,18 @@ public class PP extends OpMode {
                 double rpm2 = (outtake2.getVelocity() / TICKS_PER_REV / GEAR_RATIO) * 60;
                 double avgRPM = (rpm1 + rpm2) / 2.0;
 
-                if (pathTimer.getElapsedTimeSeconds() > SPINUP_TIME ||
-                    Math.abs(avgRPM - TARGET_RPM) <= RPM_TOLERANCE) {
+                // Transition when either: time elapsed OR RPM is within tolerance
+                if (shootTimer.getElapsedTimeSeconds() >= SPINUP_TIME ||
+                        Math.abs(avgRPM - TARGET_RPM) <= RPM_TOLERANCE) {
                     shootingState = ShootingState.TRANSFER;
-                    pathTimer.resetTimer();
+                    shootTimer.resetTimer(); // Reset timer for transfer phase
                     telemetry.addLine("Flywheels at speed - Shooting!");
                 }
+
                 telemetry.addData("Shooting State", "SPINUP");
                 telemetry.addData("Target RPM", TARGET_RPM);
                 telemetry.addData("Actual RPM", "%.0f", avgRPM);
+                telemetry.addData("Spinup Time", "%.2f / %.2f", shootTimer.getElapsedTimeSeconds(), SPINUP_TIME);
                 break;
 
             case TRANSFER:
@@ -313,41 +154,68 @@ public class PP extends OpMode {
                 transfer.setPower(TRANSFER_POWER);
                 intake.setPower(0);
 
-                if (pathTimer.getElapsedTimeSeconds() > TRANSFER_TIME) {
+                // Transition when transfer time has elapsed
+                if (shootTimer.getElapsedTimeSeconds() >= TRANSFER_TIME) {
                     shootingState = ShootingState.COMPLETE;
-                    pathTimer.resetTimer();
+                    shootTimer.resetTimer();
+                    telemetry.addLine("Transfer complete!");
                 }
+
                 telemetry.addData("Shooting State", "TRANSFER");
+                telemetry.addData("Transfer Time", "%.2f / %.2f", shootTimer.getElapsedTimeSeconds(), TRANSFER_TIME);
                 break;
 
             case COMPLETE:
-                // Stop all motors
+                // Stop shooting motors (flywheels and transfer)
                 outtake1.setVelocity(0);
                 outtake2.setVelocity(0);
                 transfer.setPower(0);
-                intake.setPower(0);
+                // Don't stop intake here - let the path state control it
+
                 telemetry.addData("Shooting State", "COMPLETE");
+                break;
+
+            case IDLE:
+                // Do nothing - waiting for shooting to be triggered
+                telemetry.addData("Shooting State", "IDLE");
                 break;
         }
     }
 
+    /**
+     * Stops all motors safely
+     */
+    private void stopAllMotors() {
+        intake.setPower(0);
+        transfer.setPower(0);
+        outtake1.setVelocity(0);
+        outtake2.setVelocity(0);
+    }
+
+    /**
+     * Sets the path state and resets appropriate timers.
+     * Also initializes shooting state when entering a shooting phase.
+     */
     public void setPathState(PathState newState) {
         pathState = newState;
         pathTimer.resetTimer();
-        // Reset shooting state when entering a new shooting state
-        if (newState == PathState.SHOOT_PRELOAD ||
-            newState == PathState.SHOOT_BATCH1 ||
-            newState == PathState.SHOOT_BATCH2 ||
-            newState == PathState.SHOOT_BATCH3) {
+
+        // Reset shooting state when entering a shooting state
+        if (newState == PathState.SHOOT_BALLS) {
             shootingState = ShootingState.SPINUP;
+            shootTimer.resetTimer(); // Reset the shoot timer for the new sequence
+        } else {
+            // When not in a shooting state, set to IDLE
+            shootingState = ShootingState.IDLE;
         }
     }
+
     @Override
     public void init() {
-        pathState = PathState.DRIVE_STARTPOS_SHOOTPOS; //First PathLine
-        shootingState = ShootingState.SPINUP;
         pathTimer = new Timer();
         opModeTimer = new Timer();
+        shootTimer = new Timer(); // Separate timer for shooting sequence
+
         follower = Constants.createFollower(hardwareMap);
 
         // Initialize intake/transfer/outtake motors
@@ -364,18 +232,38 @@ public class PP extends OpMode {
         outtake1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         outtake2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-        // Float for flywheels
+        // Float for flywheels (coast when power is zero)
         outtake1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         outtake2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
 
+        // Set brake behavior for intake and transfer
+        intake.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        transfer.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
         buildPaths();
         follower.setPose(startPose);
+
+        // Initialize states
+        pathState = PathState.DRIVE_TO_SHOOT;
+        shootingState = ShootingState.IDLE;
+
+        telemetry.addLine("Initialized - Ready to start");
+        telemetry.update();
     }
 
-    public void start(){
+    @Override
+    public void start() {
         opModeTimer.resetTimer();
-        setPathState(pathState);
+        pathTimer.resetTimer();
+        shootTimer.resetTimer();
+
+        // Actually start the first path
+        follower.followPath(driveToShoot, true);
+        pathState = PathState.DRIVE_TO_SHOOT;
+
+        telemetry.addLine("Starting autonomous...");
     }
+
     @Override
     public void loop() {
         follower.update();
@@ -384,10 +272,12 @@ public class PP extends OpMode {
         // Telemetry data
         Pose currentPose = follower.getPose();
         telemetry.addData("Path State", pathState);
+        telemetry.addData("Shooting State", shootingState);
         telemetry.addData("X", currentPose.getX());
         telemetry.addData("Y", currentPose.getY());
         telemetry.addData("Heading", Math.toDegrees(currentPose.getHeading()));
-        telemetry.addData("Path Time", pathTimer.getElapsedTimeSeconds());
+        telemetry.addData("Path Time", "%.2f", pathTimer.getElapsedTimeSeconds());
+        telemetry.addData("Follower Busy", follower.isBusy());
         telemetry.update();
     }
 }
