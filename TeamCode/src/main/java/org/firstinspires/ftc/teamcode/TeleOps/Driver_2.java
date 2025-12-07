@@ -56,9 +56,7 @@ public class Driver_2 extends OpMode {
     private boolean dpadUpPressed = false;
     private boolean dpadDownPressed = false;
     private boolean autoLockActive = false;
-    private boolean r3WasPressed = false;
-    private boolean intakeActive = false;
-    private boolean leftBumperWasPressed = false;
+    private boolean gp1LeftBumperWasPressed = false;
 
     private ElapsedTime timer = new ElapsedTime();
 
@@ -94,8 +92,8 @@ public class Driver_2 extends OpMode {
 
 
         telemetry.addLine("Driver2 Initialized");
-        telemetry.addLine("Gamepad 1: Drive");
-        telemetry.addLine("Gamepad 2: Intake/Transfer/Outtake + Autolock (LT)");
+        telemetry.addLine("Gamepad 1: Drive + Autolock (LB)");
+        telemetry.addLine("Gamepad 2: Intake/Transfer/Outtake");
         telemetry.addData("Target RPM", targetRPM);
         telemetry.update();
     }
@@ -109,14 +107,13 @@ public class Driver_2 extends OpMode {
 
     @Override
     public void loop() {
-        // ========== AUTOLOCK TOGGLE (Gamepad 2 Left Trigger) ==========
+        // ========== AUTOLOCK TOGGLE (Gamepad 1 Left Bumper) ==========
 
-        // Toggle autolock with gamepad2 left trigger
-        boolean ltIsPressed = gamepad2.left_trigger > TRIGGER_THRESHOLD;
-        if (ltIsPressed && !r3WasPressed) {
+        // Toggle autolock with gamepad1 left bumper
+        if (gamepad1.left_bumper && !gp1LeftBumperWasPressed) {
             autoLockActive = !autoLockActive;
         }
-        r3WasPressed = ltIsPressed;
+        gp1LeftBumperWasPressed = gamepad1.left_bumper;
 
         // ========== GAMEPAD 1: DRIVING ==========
 
@@ -163,7 +160,7 @@ public class Driver_2 extends OpMode {
                 } else {
                     // Locked on target
                     rot = 0; // Stop rotation
-                    gamepad2.rumble(100); // Vibrate controller
+                    gamepad1.rumble(100); // Vibrate gamepad1 when locked
                     telemetry.addLine("🔒 AUTOLOCK ACTIVE - LOCKED ✓✓✓");
                     telemetry.addData("Target Error", "%.2f°", tx);
                 }
@@ -200,21 +197,11 @@ public class Driver_2 extends OpMode {
 
         // ========== GAMEPAD 2: INTAKE/TRANSFER/OUTTAKE CONTROLS ==========
 
-        // Intake control - Left bumper toggles forward, Square turns off
-        boolean leftBumperIsPressed = gamepad2.left_bumper;
-
-        // Toggle intake on/off with left bumper (edge detection)
-        if (leftBumperIsPressed && !leftBumperWasPressed) {
-            intakeActive = !intakeActive;
-        }
-        leftBumperWasPressed = leftBumperIsPressed;
-
-        // Apply intake power based on toggle state
-        if (intakeActive) {
+        // Intake control - Left bumper hold-type (only runs while held)
+        if (gamepad2.left_bumper) {
             intake.setPower(INTAKE_POWER);
         } else if (gamepad2.x) {  // Square button (X on Xbox) - reverse
             intake.setPower(-INTAKE_POWER);
-            intakeActive = false;  // Turn off toggle if reversing
         } else {
             intake.setPower(0);
         }
@@ -257,24 +244,23 @@ public class Driver_2 extends OpMode {
         double rpm1 = (outtake1.getVelocity() / TICKS_PER_REV / GEAR_RATIO) * 60;
         double rpm2 = (outtake2.getVelocity() / TICKS_PER_REV / GEAR_RATIO) * 60;
 
-        // Check if outtake is at target RPM and vibrate both gamepads
+        // Check if outtake is at target RPM and vibrate gamepad2
         boolean atTargetRPM = false;
         if (gamepad2.right_bumper && targetRPM > 0) {
             double avgRPM = (rpm1 + rpm2) / 2.0;
             if (Math.abs(avgRPM - targetRPM) <= RPM_TOLERANCE) {
                 atTargetRPM = true;
-                gamepad1.rumble(50);  // Small vibration for gamepad 1
-                gamepad2.rumble(50);  // Small vibration for gamepad 2
+                gamepad2.rumble(50);  // Vibrate gamepad2 when at target RPM
             }
         }
 
         // Telemetry
         telemetry.addLine("=== DRIVE ===");
         telemetry.addData("Speed Mode", speed == SLOW_SPEED ? "SLOW" : speed == FAST_SPEED ? "FAST" : "NORMAL");
-        telemetry.addData("Autolock", autoLockActive ? "🔒 ON (GP2 LT to toggle)" : "OFF (GP2 LT to toggle)");
+        telemetry.addData("Autolock", autoLockActive ? "🔒 ON (GP1 LB to toggle)" : "OFF (GP1 LB to toggle)");
         telemetry.addLine();
         telemetry.addLine("=== INTAKE/TRANSFER/OUTTAKE ===");
-        telemetry.addData("Intake", intakeActive ? "ON (TOGGLE)" : gamepad2.x ? "REVERSE" : "OFF");
+        telemetry.addData("Intake", gamepad2.left_bumper ? "ON (HOLD)" : gamepad2.x ? "REVERSE" : "OFF");
         telemetry.addData("Transfer", gamepad2.right_trigger > TRIGGER_THRESHOLD ? "RUNNING" : "OFF");
         telemetry.addData("Target RPM", "%.0f (D-pad to adjust)", targetRPM);
         telemetry.addData("Actual RPM", "%.0f / %.0f", rpm1, rpm2);
