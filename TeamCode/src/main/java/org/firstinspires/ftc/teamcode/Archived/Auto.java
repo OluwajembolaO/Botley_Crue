@@ -3,6 +3,8 @@ package org.firstinspires.ftc.teamcode.Archived;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
+import org.firstinspires.ftc.teamcode.autonomous.PP.Functions;
+
 @Autonomous(name="Auto")
 public class Auto extends LinearOpMode {
 

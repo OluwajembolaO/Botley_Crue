@@ -9,8 +9,8 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-@TeleOp(name="Driver2_RED")
-public class Driver_2 extends OpMode {
+@TeleOp(name="Driver3_BLUE")
+public class Driver_3 extends OpMode {
     // Drive motors for gamepad 1
     private DcMotor topLeftMotor;
     private DcMotor topRightMotor;
@@ -100,7 +100,7 @@ public class Driver_2 extends OpMode {
 
     @Override
     public void start() {
-        limelight.pipelineSwitch(8);
+        limelight.pipelineSwitch(9  );
         limelight.start();
         timer.reset();
     }

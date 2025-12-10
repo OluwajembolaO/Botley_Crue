@@ -18,10 +18,10 @@ public class Constants {
     public static FollowerConstants followerConstants = new FollowerConstants()
             .mass(12.1) // Mass of robot (in Kilograms)
             //TODO
-            .forwardZeroPowerAcceleration(-48.34723762308191)
-            .lateralZeroPowerAcceleration(-57.412159916659036)
-            .translationalPIDFCoefficients(new PIDFCoefficients(0.08,0.001,.01,.07)) //Its on PIDF on pp thing
-            .headingPIDFCoefficients(new PIDFCoefficients(1,0.005,0.05,.03))
+            .forwardZeroPowerAcceleration(-38.18046817305662)
+            .lateralZeroPowerAcceleration(-66.45712898315684)
+            .translationalPIDFCoefficients(new PIDFCoefficients(0.066,0.000028,.01,.025)) //Its on PIDF on pp thing
+            .headingPIDFCoefficients(new PIDFCoefficients(2,0.005,0.05,.000925))
             .drivePIDFCoefficients(new FilteredPIDFCoefficients(0.1,0,0.00035,0.6,.015)) //Also on thing
             .centripetalScaling(0.0005)
             .translationalPIDFSwitch(3)
@@ -31,7 +31,7 @@ public class Constants {
 
 
     public static MecanumConstants driveConstants = new MecanumConstants()
-            .maxPower(.85)
+            .maxPower(1)
             .rightFrontMotorName("motor2")
             .rightRearMotorName("motor4")
             .leftRearMotorName("motor3")
@@ -44,14 +44,14 @@ public class Constants {
             .rightFrontMotorDirection(DcMotorSimple.Direction.REVERSE)
             .rightRearMotorDirection(DcMotorSimple.Direction.FORWARD)
             //TODO A lot of testing - Jem
-            .xVelocity(64.882451430241)
-            .yVelocity(51.51972036286602)
+            .xVelocity(71.7694250392163)
+            .yVelocity(55.82269913801058)
             ;
 
     public static PinpointConstants localizerConstants = new PinpointConstants()
             //TODO: I need to tune this - Jem
-            .forwardPodY(-5.5)
-            .strafePodX(5.5)
+            .forwardPodY(-1.5)
+            .strafePodX(-5.5)
 
             .distanceUnit(DistanceUnit.INCH) //Change units
             .hardwareMapName("pinpoint") //Change Name
@@ -65,7 +65,7 @@ public class Constants {
     public static PathConstraints pathConstraints = new PathConstraints(
             0.99,
             100,
-            1,
+            1.2,
             1);
 
     public static Follower createFollower(HardwareMap hardwareMap) {

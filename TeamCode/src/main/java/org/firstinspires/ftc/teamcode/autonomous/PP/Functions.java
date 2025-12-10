@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.Archived;
+package org.firstinspires.ftc.teamcode.autonomous.PP;
 
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -16,9 +16,10 @@ public class Functions {
         rearRight = hardwareMap.get(DcMotor.class, "motor4");
         intake = hardwareMap.get(DcMotor.class, "intake");
         limelight3A = hardwareMap.get(Limelight3A.class, "limelight");
-      
+
         frontRight.setDirection(DcMotorSimple.Direction.REVERSE);
         frontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
+
         intake.setDirection(DcMotorSimple.Direction.REVERSE);
     }
 
