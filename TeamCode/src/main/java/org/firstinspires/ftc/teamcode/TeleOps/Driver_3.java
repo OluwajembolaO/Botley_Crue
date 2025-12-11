@@ -27,9 +27,9 @@ public class Driver_3 extends OpMode {
     private Limelight3A limelight;
 
     // Speed constants - easy to tune
-    private static final double NORMAL_SPEED = 0.65;
-    private static final double SLOW_SPEED = 0.4;
-    private static final double FAST_SPEED = 0.9;
+    private static final double NORMAL_SPEED = 0.9;
+    private static final double SLOW_SPEED = 0.8;
+    private static final double FAST_SPEED = 0.1;
     private static final double TRIGGER_THRESHOLD = 0.5;
     private static final double ROTATION_MULTIPLIER = 0.7;
 
